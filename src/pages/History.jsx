@@ -32,7 +32,7 @@ export default function History() {
   });
 
   useEffect(() => {
-    fetch('/lotto.json')
+    fetch(`${import.meta.env.BASE_URL}lotto.json`)
       .then((res) => res.json())
       .then((data) => {
         setHistory(data);
