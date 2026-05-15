@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { getBallColor } from '../lib/lotto';
+import { getBallColor, fetchLottoHistory } from '../lib/lotto';
 
 // 각 회차 당첨조합이 역대 전체에서 2~5등에 몇 번 해당했는지 계산.
 // (1등은 자기 자신 = 항상 1이라 생략)
@@ -38,8 +38,7 @@ export default function History() {
   });
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}lotto.json`)
-      .then((res) => res.json())
+    fetchLottoHistory()
       .then((data) => {
         setHistory(data);
         setLoading(false);

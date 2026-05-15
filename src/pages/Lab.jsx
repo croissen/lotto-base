@@ -7,6 +7,7 @@ import { hasValidPass } from '../lib/pass';
 import AdGateModal from '../components/AdGateModal';
 import LatestRoundCard from '../components/LatestRoundCard';
 import GuideModal from '../components/GuideModal';
+import { useLatestRound } from '../lib/useLatestRound';
 
 const TOTAL = 8145060; // C(45,6)
 const RANK_LABELS = [
@@ -53,6 +54,7 @@ export default function Lab() {
   const captureRef = useRef(null);
   const [showGate, setShowGate] = useState(false);
   const [guide, setGuide] = useState(null); // 'ranks' | 'balls' | 'odd' | 'sum' | null
+  const latestRound = useLatestRound() ?? 1223;
 
   const setRank = (key, field, value) =>
     setRanks((r) => ({ ...r, [key]: { ...r[key], [field]: value } }));
@@ -227,7 +229,7 @@ export default function Lab() {
           </HeaderActions>
         </CardTitle>
         <CardHint>
-          각 조합이 역대 1223회차에서 몇 번 해당 등수였는지로 거릅니다. 빈칸=무제한,
+          각 조합이 역대 {latestRound.toLocaleString()}회차에서 몇 번 해당 등수였는지로 거릅니다. 빈칸=무제한,
           한 칸만=정확히 그 값, 둘 다=범위.
         </CardHint>
         {RANK_LABELS.map(([key, label, desc]) => (

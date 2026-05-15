@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { getBallColor } from '../lib/lotto';
+import { getBallColor, fetchLottoHistory } from '../lib/lotto';
 
 // 회차 → 날짜 변환 기준점: 1223회차 = 2026-05-09 (토요일)
 // 이후 회차는 +7일씩
@@ -25,8 +25,7 @@ export default function LatestRoundCard() {
   const [pinned, setPinned] = useState(false);
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}lotto.json`)
-      .then((r) => r.json())
+    fetchLottoHistory()
       .then((data) => {
         setHistory(data);
         const max = Math.max(...data.map((r) => r.회차));

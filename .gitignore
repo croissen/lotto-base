@@ -27,6 +27,9 @@ dist-ssr
 *.csv
 *.npz
 
+# 내부 핸드오프 문서 (Claude 작업 인계용 — 비공개 유지)
+PROJECT_HANDOFF.md
+
 # Python
 __pycache__/
 *.pyc

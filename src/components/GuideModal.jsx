@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { getBallColor } from '../lib/lotto';
+import { useLatestRound } from '../lib/useLatestRound';
 
 export default function GuideModal({ type, onClose }) {
   // 모달 열려있는 동안 배경(body) 스크롤 잠금
@@ -32,16 +33,22 @@ export default function GuideModal({ type, onClose }) {
 
 /* ───── 1. 역대 등수 출현 횟수 ───── */
 function RanksGuide() {
+  const latestRound = useLatestRound() ?? 1223;
+  const r1Count = latestRound; // 1등 패턴 ≈ 회차 수
+  const r2Count = Math.round((latestRound * 6) / 1000); // 천 단위
+  const r3Count = Math.round((latestRound * 228) / 10000); // 만 단위
+
   return (
     <Body>
       <Title>역대 등수 출현 횟수란?</Title>
       <P>
-        800만 개의 모든 6개 숫자 조합을 <Em>역대 1,223회차</Em>의 당첨번호와
+        800만 개의 모든 6개 숫자 조합을{' '}
+        <Em>역대 {latestRound.toLocaleString()}회차</Em>의 당첨번호와
         하나하나 비교해서, 그 조합이 1~5등에 몇 번 해당했는지 미리 계산해둔 값입니다.
       </P>
 
       <ExampleBox>
-        <ExLabel>예시 — 1223회차 당첨조합</ExLabel>
+        <ExLabel>예시 — 어떤 1등 조합</ExLabel>
         <BallRow>
           {[16, 18, 20, 32, 33, 39].map((n) => (
             <Ball key={n} $color={getBallColor(n)}>
@@ -59,7 +66,7 @@ function RanksGuide() {
       </ExampleBox>
 
       <Section>
-        <SectionTitle>📊 1,223회차 통계의 핵심</SectionTitle>
+        <SectionTitle>📊 {latestRound.toLocaleString()}회차 통계의 핵심</SectionTitle>
         <Bullets>
           <li>
             <b>1등</b>: 같은 6개 조합이 두 번 나온 적{' '}
@@ -85,9 +92,9 @@ function RanksGuide() {
         <SectionTitle>🎯 추천 필터값</SectionTitle>
         <ExampleBox>
           <Bullets>
-            <li>1등: <b>0 ~ 0</b> (역대 1등 조합 1,223개 제거)</li>
-            <li>2등: <b>0 ~ 0</b> (역대 2등 패턴 약 7천 개 제거)</li>
-            <li>3등: <b>0 ~ 0</b> (역대 3등 패턴 약 27만 개 제거)</li>
+            <li>1등: <b>0 ~ 0</b> (역대 1등 조합 {r1Count.toLocaleString()}개 제거)</li>
+            <li>2등: <b>0 ~ 0</b> (역대 2등 패턴 약 {r2Count}천 개 제거)</li>
+            <li>3등: <b>0 ~ 0</b> (역대 3등 패턴 약 {r3Count}만 개 제거)</li>
             <li>4등: <b>0 ~ 3</b></li>
             <li>5등: <b>20 ~ 30</b></li>
           </Bullets>
