@@ -1,0 +1,25 @@
+{
+  "name": "LottoBase",
+  "short_name": "LottoBase",
+  "description": "역대 통계로 800만 경우의 수를 99%까지 좁히는 로또 분석 도구",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0c0c0e",
+  "theme_color": "#7c5cff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
