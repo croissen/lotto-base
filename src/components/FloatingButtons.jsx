@@ -51,7 +51,6 @@ export default function FloatingButtons() {
       {showMenu && (
         <Menu>
           <MenuItem onClick={copyLink}>🔗 링크 복사</MenuItem>
-          <MenuItem onClick={nativeShare}>📤 공유하기</MenuItem>
         </Menu>
       )}
 
@@ -70,8 +69,8 @@ export default function FloatingButtons() {
 
 const Stack = styled.div`
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  right: 10%;
+  bottom: 10%;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -80,8 +79,8 @@ const Stack = styled.div`
 `;
 
 const Fab = styled.button`
-  width: 48px;
-  height: 48px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: 1px solid ${(p) => p.theme.border};
   background: ${(p) => p.theme.bgElevated};

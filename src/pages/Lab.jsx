@@ -3,6 +3,8 @@ import styled, { keyframes } from 'styled-components';
 import html2canvas from 'html2canvas';
 import { supabase } from '../lib/supabase';
 import { maskToNumbers, numbersToMask, getBallColor } from '../lib/lotto';
+import { hasValidPass } from '../lib/pass';
+import AdGateModal from '../components/AdGateModal';
 
 const TOTAL = 8145060; // C(45,6)
 const RANK_LABELS = [
@@ -46,6 +48,7 @@ export default function Lab() {
   const [pickPhase, setPickPhase] = useState('idle'); // idle | picking | picked
   const [picks, setPicks] = useState([]);
   const captureRef = useRef(null);
+  const [showGate, setShowGate] = useState(false);
 
   const setRank = (key, field, value) =>
     setRanks((r) => ({ ...r, [key]: { ...r[key], [field]: value } }));
@@ -98,7 +101,13 @@ export default function Lab() {
     };
   }
 
-  const handleReduce = async () => {
+  // 확률 줄이기 버튼 클릭 → 이용권 있으면 바로 실행, 없으면 광고 게이트
+  const handleReduceClick = () => {
+    if (hasValidPass()) runReduce();
+    else setShowGate(true);
+  };
+
+  const runReduce = async () => {
     setPhase('counting');
     setError(null);
     setResult(null);
@@ -273,7 +282,7 @@ export default function Lab() {
         </RangeInputs>
       </Card>
 
-      <ReduceBtn onClick={handleReduce} disabled={phase === 'counting'}>
+      <ReduceBtn onClick={handleReduceClick} disabled={phase === 'counting'}>
         {phase === 'counting' ? '분석 중...' : '확률 줄이기'}
       </ReduceBtn>
 
@@ -355,6 +364,16 @@ export default function Lab() {
             </NoResult>
           )}
         </ResultCard>
+      )}
+
+      {showGate && (
+        <AdGateModal
+          onClose={() => setShowGate(false)}
+          onPass={() => {
+            setShowGate(false);
+            runReduce();
+          }}
+        />
       )}
     </Wrap>
   );
