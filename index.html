@@ -2,26 +2,78 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#7c5cff" />
-    <meta name="description" content="역대 통계로 800만 경우의 수를 99%까지 좁히는 로또 분석 도구" />
 
-    <!-- 파비콘 / 앱 아이콘 (realfavicongenerator 풀세트) -->
-    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png" />
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
-    <link rel="manifest" href="./manifest.json" />
+    <!-- Primary SEO -->
+    <title>로또베이스 LottoBase — 데이터 기반 로또 번호 분석 도구</title>
+    <meta name="description" content="역대 1,223회차 통계를 분석해 8,145,060개 경우의 수를 99%까지 좁히는 무료 로또 번호 생성기. 등수 출현 횟수, 홀짝 비율, 합계 범위, 제외/필수 번호로 정밀 필터링." />
+    <meta name="keywords" content="로또베이스, lottobase, 로또 번호 생성기, 로또 분석, 로또 통계, 로또 번호 추천, 로또 자동 추첨, 로또 데이터 분석, 로또 회차 분석" />
+    <meta name="author" content="LottoBase" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://lottobase.kr/" />
 
-    <!-- 오픈그래프 (공유 시 미리보기) -->
-    <meta property="og:title" content="LottoBase — 데이터 기반 로또 번호 분석" />
-    <meta property="og:description" content="역대 통계로 800만 경우의 수를 99%까지 좁히는 도구" />
-    <meta property="og:image" content="./web-app-manifest-512x512.png" />
+    <!-- 파비콘 / 앱 아이콘 -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Open Graph (카카오·페북·블로그 공유 미리보기) -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lottobase.kr/" />
+    <meta property="og:site_name" content="LottoBase" />
+    <meta property="og:title" content="로또베이스 — 데이터 기반 로또 번호 분석" />
+    <meta property="og:description" content="역대 통계로 800만 경우의 수를 99%까지 좁히는 무료 도구" />
+    <meta property="og:image" content="https://lottobase.kr/web-app-manifest-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="ko_KR" />
 
-    <title>LottoBase — 데이터 기반 로또 번호 분석</title>
-    <script type="module" crossorigin src="/lotto-base/assets/index-D72Ehkji.js"></script>
-    <link rel="stylesheet" crossorigin href="/lotto-base/assets/index-BR-vp-id.css">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://lottobase.kr/" />
+    <meta name="twitter:title" content="로또베이스 — 데이터 기반 로또 번호 분석" />
+    <meta name="twitter:description" content="역대 통계로 800만 경우의 수를 99%까지 좁히는 무료 도구" />
+    <meta name="twitter:image" content="https://lottobase.kr/web-app-manifest-512x512.png" />
+
+    <!-- SPA 라우팅: 404.html에서 인코딩된 경로를 원래 URL로 복원 -->
+    <script type="text/javascript">
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function (s) {
+            return s.replace(/~and~/g, '&');
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location));
+    </script>
+
+    <!-- 구조화 데이터: 검색 결과에 풍부한 정보 노출 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "로또베이스 LottoBase",
+        "alternateName": "LottoBase",
+        "url": "https://lottobase.kr/",
+        "description": "역대 1,223회차 통계 기반 로또 번호 분석 및 생성 도구",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "inLanguage": "ko",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "KRW"
+        }
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-61RiCFoJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BR-vp-id.css">
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>로또베이스</title>
+    <!--
+      SPA on GitHub Pages 트릭:
+      직접 입력한 경로(예: lottobase.kr/lab)나 새로고침 시 GitHub Pages가
+      이 404.html을 서빙. 여기서 경로를 ?/ 쿼리에 인코딩해 루트로 리다이렉트.
+      index.html의 스크립트가 그 쿼리를 받아 history.replaceState로 원래
+      URL로 복원하고 React Router가 그 경로를 처리.
+    -->
+    <script type="text/javascript">
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        '/?/' + l.pathname.slice(1).replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body></body>
+</html>
