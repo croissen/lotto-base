@@ -69,8 +69,7 @@ export default function History() {
     <Wrap>
       <PageTitle>당첨 히스토리</PageTitle>
       <PageDesc>
-        역대 회차별 당첨 번호와, 그 조합이 전체 회차에서 2~5등에 해당한 횟수입니다.
-        (1등은 자기 자신이므로 생략)
+        역대 회차별 당첨 번호와, 그 조합이 전체 회차에서 2~5등에 해당한 횟수입니다. 1등은 역대 1번씩 자기 자신의 회차에서 나온 숫자입니다.
       </PageDesc>
 
       {loading ? (
