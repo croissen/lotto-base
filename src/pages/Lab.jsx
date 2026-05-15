@@ -37,6 +37,7 @@ function parseRange(min, max, hardMax) {
 export default function Lab() {
   const [ranks, setRanks] = useState(EMPTY_RANKS);
   const [excluded, setExcluded] = useState(new Set());
+  const [required, setRequired] = useState(new Set());
   const [oddSel, setOddSel] = useState(new Set());
   const [sum, setSum] = useState({ min: '', max: '' });
 
@@ -53,12 +54,45 @@ export default function Lab() {
   const setRank = (key, field, value) =>
     setRanks((r) => ({ ...r, [key]: { ...r[key], [field]: value } }));
 
-  const toggleExclude = (n) =>
-    setExcluded((s) => {
-      const next = new Set(s);
-      next.has(n) ? next.delete(n) : next.add(n);
-      return next;
-    });
+  // 공 상태 변경 — 한 번에 한 상태만 (제외/필수는 상호 배타)
+  const setExclude = (n) => {
+    setRequired((r) => { const x = new Set(r); x.delete(n); return x; });
+    setExcluded((s) => { const x = new Set(s); x.add(n); return x; });
+  };
+  const setRequire = (n) => {
+    setExcluded((s) => { const x = new Set(s); x.delete(n); return x; });
+    setRequired((r) => { const x = new Set(r); x.add(n); return x; });
+  };
+  const clearBall = (n) => {
+    setExcluded((s) => { const x = new Set(s); x.delete(n); return x; });
+    setRequired((r) => { const x = new Set(r); x.delete(n); return x; });
+  };
+
+  // 스와이프 제스처: pointerdown에서 시작점 기록, pointerup에서 dx/dy 판단
+  // PC 마우스 / 모바일 터치 모두 PointerEvent로 통합 처리
+  const handleBallPointerDown = (e) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.currentTarget.dataset.sx = String(e.clientX);
+    e.currentTarget.dataset.sy = String(e.clientY);
+  };
+  const handleBallPointerUp = (n) => (e) => {
+    const sx = parseFloat(e.currentTarget.dataset.sx);
+    const sy = parseFloat(e.currentTarget.dataset.sy);
+    if (Number.isNaN(sx)) return;
+    e.currentTarget.dataset.sx = '';
+    const dx = e.clientX - sx;
+    const dy = e.clientY - sy;
+    const SWIPE = 25;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    if (absX < SWIPE && absY < SWIPE) {
+      clearBall(n);            // 탭 → 초기화
+    } else if (absX > absY) {
+      if (dx > 0) setRequire(n); // → 스와이프
+      else setExclude(n);        // ← 스와이프
+    }
+    // 세로 스와이프는 무시 (페이지 스크롤로 간주)
+  };
 
   const toggleOdd = (v) =>
     setOddSel((s) => {
@@ -69,7 +103,10 @@ export default function Lab() {
 
   // 섹션별 초기화
   const resetRanks = () => setRanks(EMPTY_RANKS);
-  const resetExcluded = () => setExcluded(new Set());
+  const resetBalls = () => {
+    setExcluded(new Set());
+    setRequired(new Set());
+  };
   const resetOdd = () => setOddSel(new Set());
   const resetSum = () => setSum({ min: '', max: '' });
 
@@ -98,6 +135,7 @@ export default function Lab() {
       odd_min: oddMin, odd_max: oddMax,
       sum_min: sm, sum_max: sx,
       excluded_mask: numbersToMask([...excluded]),
+      required_mask: numbersToMask([...required]),
     };
   }
 
@@ -168,7 +206,7 @@ export default function Lab() {
     <Wrap>
       <PageTitle>분석실</PageTitle>
       <PageDesc>
-        조건을 설정하고 <b>확률 줄이기</b>를 누르면, 800만 경우의 수 중 조건에
+        조건을 설정하고 <b>확률 줄이기</b>를 누르면, 8,145,060 경우의 수 중 조건에
         맞는 조합만 남깁니다. 모든 항목은 선택사항입니다.
       </PageDesc>
 
@@ -212,23 +250,39 @@ export default function Lab() {
       <Card>
         <CardTitle>
           <TitleText>
-            제외할 번호 <Optional>(선택)</Optional>
-            {excluded.size > 0 && <SelCount>{excluded.size}개 제외 중</SelCount>}
+            번호 선택 <Optional>(선택)</Optional>
+            {(excluded.size > 0 || required.size > 0) && (
+              <SelCount>
+                {excluded.size > 0 && `${excluded.size}개 제외`}
+                {excluded.size > 0 && required.size > 0 && ' · '}
+                {required.size > 0 && `${required.size}개 필수`}
+              </SelCount>
+            )}
           </TitleText>
-          <ResetBtn onClick={resetExcluded}>초기화</ResetBtn>
+          <ResetBtn onClick={resetBalls}>초기화</ResetBtn>
         </CardTitle>
-        <CardHint>클릭하면 그 번호가 포함된 조합을 모두 제외합니다.</CardHint>
+        <CardHint>
+          <b>← 스와이프</b>: 제외 (회색 ✕) ·{' '}
+          <b>→ 스와이프</b>: 필수 포함 (초록 ✓) · <b>탭</b>: 초기화
+        </CardHint>
         <BallGrid>
           {Array.from({ length: 45 }, (_, i) => i + 1).map((n) => {
-            const off = excluded.has(n);
+            const isExcluded = excluded.has(n);
+            const isRequired = required.has(n);
+            const state = isExcluded
+              ? 'excluded'
+              : isRequired
+              ? 'required'
+              : 'normal';
             return (
               <NumBall
                 key={n}
-                $color={off ? '#555' : getBallColor(n)}
-                $off={off}
-                onClick={() => toggleExclude(n)}
+                $color={isExcluded ? '#555' : getBallColor(n)}
+                $state={state}
+                onPointerDown={handleBallPointerDown}
+                onPointerUp={handleBallPointerUp(n)}
               >
-                {off ? '✕' : n}
+                {isExcluded ? '✕' : isRequired ? '✓' : n}
               </NumBall>
             );
           })}
@@ -493,22 +547,25 @@ const Tilde = styled.span`
 `;
 const BallGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   gap: 8px;
   @media (max-width: 640px) {
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(5, 1fr);
   }
 `;
 const NumBall = styled.button`
   aspect-ratio: 1;
   border-radius: 50%;
   border: none;
-  background: ${(p) => p.$color};
+  background: ${(p) =>
+    p.$state === 'required' ? p.theme.success : p.$color};
   color: #fff;
   font-weight: 700;
-  font-size: 14px;
-  opacity: ${(p) => (p.$off ? 0.45 : 1)};
-  transition: transform 0.1s ease, opacity 0.1s ease;
+  font-size: 20px;
+  touch-action: pan-y; /* 세로 스크롤 허용, 가로 스와이프는 우리가 처리 */
+  user-select: none;
+  opacity: ${(p) => (p.$state === 'excluded' ? 0.45 : 1)};
+  transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
   &:hover {
     transform: scale(1.1);
   }
