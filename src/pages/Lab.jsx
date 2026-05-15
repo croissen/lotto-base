@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase';
 import { maskToNumbers, numbersToMask, getBallColor } from '../lib/lotto';
 import { hasValidPass } from '../lib/pass';
 import AdGateModal from '../components/AdGateModal';
+import LatestRoundCard from '../components/LatestRoundCard';
+import GuideModal from '../components/GuideModal';
 
 const TOTAL = 8145060; // C(45,6)
 const RANK_LABELS = [
@@ -50,6 +52,7 @@ export default function Lab() {
   const [picks, setPicks] = useState([]);
   const captureRef = useRef(null);
   const [showGate, setShowGate] = useState(false);
+  const [guide, setGuide] = useState(null); // 'ranks' | 'balls' | 'odd' | 'sum' | null
 
   const setRank = (key, field, value) =>
     setRanks((r) => ({ ...r, [key]: { ...r[key], [field]: value } }));
@@ -204,11 +207,13 @@ export default function Lab() {
 
   return (
     <Wrap>
-      <PageTitle>분석실</PageTitle>
+      <PageTitle>연구실</PageTitle>
       <PageDesc>
         조건을 설정하고 <b>확률 줄이기</b>를 누르면, 8,145,060 경우의 수 중 조건에
         맞는 조합만 남깁니다. 모든 항목은 선택사항입니다.
       </PageDesc>
+
+      <LatestRoundCard />
 
       {/* 1. 등수 범위 */}
       <Card>
@@ -216,7 +221,10 @@ export default function Lab() {
           <TitleText>
             역대 등수 출현 횟수 <Optional>(선택)</Optional>
           </TitleText>
-          <ResetBtn onClick={resetRanks}>초기화</ResetBtn>
+          <HeaderActions>
+            <GuideBtn onClick={() => setGuide('ranks')}>사용 가이드</GuideBtn>
+            <ResetBtn onClick={resetRanks}>초기화</ResetBtn>
+          </HeaderActions>
         </CardTitle>
         <CardHint>
           각 조합이 역대 1223회차에서 몇 번 해당 등수였는지로 거릅니다. 빈칸=무제한,
@@ -259,7 +267,10 @@ export default function Lab() {
               </SelCount>
             )}
           </TitleText>
-          <ResetBtn onClick={resetBalls}>초기화</ResetBtn>
+          <HeaderActions>
+            <GuideBtn onClick={() => setGuide('balls')}>사용 가이드</GuideBtn>
+            <ResetBtn onClick={resetBalls}>초기화</ResetBtn>
+          </HeaderActions>
         </CardTitle>
         <CardHint>
           <b>← 스와이프</b>: 제외 (회색 ✕) ·{' '}
@@ -295,7 +306,10 @@ export default function Lab() {
           <TitleText>
             홀짝 비율 <Optional>(선택)</Optional>
           </TitleText>
-          <ResetBtn onClick={resetOdd}>초기화</ResetBtn>
+          <HeaderActions>
+            <GuideBtn onClick={() => setGuide('odd')}>사용 가이드</GuideBtn>
+            <ResetBtn onClick={resetOdd}>초기화</ResetBtn>
+          </HeaderActions>
         </CardTitle>
         <CardHint>
           홀수 개수 기준. 선택한 값들의 범위로 거릅니다. (예: 2,3,4 선택 → 홀수
@@ -316,7 +330,10 @@ export default function Lab() {
           <TitleText>
             번호 총합 범위 <Optional>(선택)</Optional>
           </TitleText>
-          <ResetBtn onClick={resetSum}>초기화</ResetBtn>
+          <HeaderActions>
+            <GuideBtn onClick={() => setGuide('sum')}>사용 가이드</GuideBtn>
+            <ResetBtn onClick={resetSum}>초기화</ResetBtn>
+          </HeaderActions>
         </CardTitle>
         <CardHint>6개 번호의 합. 역대 1등 평균은 약 138입니다.</CardHint>
         <RangeInputs>
@@ -429,6 +446,8 @@ export default function Lab() {
           }}
         />
       )}
+
+      {guide && <GuideModal type={guide} onClose={() => setGuide(null)} />}
     </Wrap>
   );
 }
@@ -496,6 +515,25 @@ const ResetBtn = styled.button`
   &:hover {
     color: ${(p) => p.theme.text};
     background: ${(p) => p.theme.bgHover};
+  }
+`;
+const HeaderActions = styled.div`
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
+`;
+const GuideBtn = styled.button`
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${(p) => p.theme.accent};
+  background: ${(p) => p.theme.accentSoft};
+  border: 1px solid ${(p) => p.theme.accent}55;
+  border-radius: 7px;
+  padding: 5px 10px;
+  &:hover {
+    background: ${(p) => p.theme.accent}22;
   }
 `;
 const CardHint = styled.p`

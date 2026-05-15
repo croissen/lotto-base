@@ -138,8 +138,8 @@ const Chips = styled.div`
 
 const Chip = styled.span`
   font-size: 13px;
-  color: ${(p) => p.theme.textMuted};
-  background: ${(p) => p.theme.bgElevated};
+  color: black;
+  background: white;
   border: 1px solid ${(p) => p.theme.border};
   padding: 7px 14px;
   border-radius: 999px;

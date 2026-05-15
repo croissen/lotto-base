@@ -19,7 +19,13 @@ function computeRoundStats(history) {
         else if (matched === 4) r4++;
         else if (matched === 3) r5++;
       }
-      return { round: cur.회차, numbers: nums, bonus: cur.보너스, r1, r2, r3, r4, r5 };
+      return {
+        round: cur.회차,
+        numbers: nums,
+        bonus: cur.보너스,
+        sum: nums.reduce((a, b) => a + b, 0),
+        r1, r2, r3, r4, r5,
+      };
     })
     .sort((a, b) => b.round - a.round);
 }
@@ -105,6 +111,7 @@ export default function History() {
                   <Th>회차</Th>
                   <Th>당첨 번호</Th>
                   <Th>보너스</Th>
+                  <Th>합</Th>
                   <Th>1등</Th>
                   <Th>2등</Th>
                   <Th>3등</Th>
@@ -130,6 +137,7 @@ export default function History() {
                         {s.bonus}
                       </Ball>
                     </Td>
+                    <Td>{s.sum}</Td>
                     <Td>{s.r1}</Td>
                     <Td>{s.r2}</Td>
                     <Td>{s.r3}</Td>

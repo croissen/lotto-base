@@ -14,7 +14,7 @@ export default function Header() {
         </Logo>
         <Nav>
           <NavLink to="/lab" $active={pathname === '/lab'}>
-            분석실
+            연구실
           </NavLink>
           <NavLink to="/history" $active={pathname === '/history'}>
             당첨 히스토리
