@@ -76,6 +76,11 @@ const Stack = styled.div`
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
+  @media (max-width: 640px) {
+    right: 16px;
+    bottom: 16px;
+    gap: 8px;
+  }
 `;
 
 const Fab = styled.button`
@@ -94,6 +99,11 @@ const Fab = styled.button`
   &:hover {
     background: ${(p) => p.theme.bgHover};
     transform: translateY(-2px);
+  }
+  @media (max-width: 640px) {
+    width: 42px;
+    height: 42px;
+    font-size: 15px;
   }
 `;
 

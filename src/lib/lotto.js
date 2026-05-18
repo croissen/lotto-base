@@ -25,6 +25,31 @@ export function numbersToMask(numbers) {
   return Number(mask); // 2^45 미만이라 Number로 안전, RPC 전달 가능
 }
 
+/** 당첨금 포맷: 2,635,945,612 → "26억 3,594만원" / 짧은 형식 → "26.4억" */
+export function formatPrize(amount, { compact = false } = {}) {
+  if (amount === null || amount === undefined) return '—';
+  const n = Number(amount);
+  if (!Number.isFinite(n) || n <= 0) return '—';
+  const EOK = 100000000;
+  const MAN = 10000;
+  if (compact) {
+    if (n >= EOK) return `${(n / EOK).toFixed(1)}억`;
+    if (n >= MAN) return `${Math.round(n / MAN).toLocaleString()}만`;
+    return n.toLocaleString();
+  }
+  const eok = Math.floor(n / EOK);
+  const man = Math.floor((n % EOK) / MAN);
+  if (eok > 0 && man > 0) return `${eok}억 ${man.toLocaleString()}만원`;
+  if (eok > 0) return `${eok}억원`;
+  if (man > 0) return `${man.toLocaleString()}만원`;
+  return `${n.toLocaleString()}원`;
+}
+
+/** 홀수 개수 계산 (홀짝비율용) */
+export function countOdd(nums) {
+  return nums.reduce((a, n) => a + (n % 2 === 1 ? 1 : 0), 0);
+}
+
 /** 한국 로또 공 색상 (구간별) */
 export function getBallColor(n) {
   if (n <= 10) return '#fbc400';
@@ -57,7 +82,9 @@ export async function fetchLottoHistory() {
         const end = start + PAGE_SIZE - 1;
         const { data, error } = await supabase
           .from('lotto_history')
-          .select('round_no, n1, n2, n3, n4, n5, n6, bonus')
+          .select(
+            'round_no, n1, n2, n3, n4, n5, n6, bonus, first_prize_amount, first_prize_winners, second_prize_amount, second_prize_winners'
+          )
           .order('round_no', { ascending: false })
           .range(start, end);
         if (error) {
@@ -80,6 +107,10 @@ export async function fetchLottoHistory() {
         번호1: r.n1, 번호2: r.n2, 번호3: r.n3,
         번호4: r.n4, 번호5: r.n5, 번호6: r.n6,
         보너스: r.bonus,
+        '1등당첨금': r.first_prize_amount,
+        '1등당첨자': r.first_prize_winners,
+        '2등당첨금': r.second_prize_amount,
+        '2등당첨자': r.second_prize_winners,
       }));
       return historyCache;
     } catch (err) {

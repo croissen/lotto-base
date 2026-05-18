@@ -45,6 +45,9 @@ const Inner = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  @media (max-width: 480px) {
+    padding: 0 12px;
+  }
 `;
 
 const Logo = styled(Link)`
@@ -56,12 +59,19 @@ const Logo = styled(Link)`
   b {
     color: ${(p) => p.theme.accent};
   }
+  @media (max-width: 480px) {
+    font-size: 17px;
+  }
 `;
 
 const Nav = styled.nav`
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: nowrap;
+  @media (max-width: 480px) {
+    gap: 2px;
+  }
 `;
 
 const NavLink = styled(Link)`
@@ -70,10 +80,15 @@ const NavLink = styled(Link)`
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
   color: ${(p) => (p.$active ? p.theme.accent : p.theme.textMuted)};
   background: ${(p) => (p.$active ? p.theme.accentSoft : 'transparent')};
   &:hover {
     color: ${(p) => p.theme.text};
+  }
+  @media (max-width: 480px) {
+    padding: 6px 8px;
+    font-size: 12px;
   }
 `;
 
@@ -90,5 +105,11 @@ const ToggleBtn = styled.button`
   justify-content: center;
   &:hover {
     background: ${(p) => p.theme.bgHover};
+  }
+  @media (max-width: 480px) {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    margin-left: 2px;
   }
 `;

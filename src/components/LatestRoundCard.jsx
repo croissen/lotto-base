@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
-import { getBallColor, fetchLottoHistory } from '../lib/lotto';
+import { getBallColor, fetchLottoHistory, formatPrize, countOdd } from '../lib/lotto';
 
 // 회차 → 날짜 변환 기준점: 1223회차 = 2026-05-09 (토요일)
 // 이후 회차는 +7일씩
@@ -57,7 +57,18 @@ export default function LatestRoundCard() {
       else if (matched === 4) r4++;
       else if (matched === 3) r5++;
     }
-    return { nums, bonus: row.보너스, r1, r2, r3, r4, r5 };
+    const odd = countOdd(nums);
+    return {
+      nums,
+      bonus: row.보너스,
+      r1, r2, r3, r4, r5,
+      odd,
+      even: 6 - odd,
+      firstAmount: row['1등당첨금'],
+      firstWinners: row['1등당첨자'],
+      secondAmount: row['2등당첨금'],
+      secondWinners: row['2등당첨자'],
+    };
   }, [round, history]);
 
   if (!bounds || !data || round === null) {
@@ -72,7 +83,14 @@ export default function LatestRoundCard() {
   const isOldest = round === bounds.min;
   const dateStr = formatYYMMDD(dateForRound(round));
 
+  const hasPrize =
+    data.firstAmount != null ||
+    data.firstWinners != null ||
+    data.secondAmount != null ||
+    data.secondWinners != null;
+
   return (
+    <>
     <Card $pinned={pinned}>
       <Head>
         <NavBtn
@@ -116,6 +134,7 @@ export default function LatestRoundCard() {
           </Ball>
         ))}
         <SumChip>합 {data.nums.reduce((a, b) => a + b, 0)}</SumChip>
+        <SumChip>홀 {data.odd} : 짝 {data.even}</SumChip>
         <Plus>+</Plus>
         <Ball $color={getBallColor(data.bonus)} $bonus>
           {data.bonus}
@@ -140,6 +159,39 @@ export default function LatestRoundCard() {
         </RankChip>
       </RankRow>
     </Card>
+
+    {hasPrize && (
+      <PrizeBox>
+        <PrizeTitle>당첨금 정보</PrizeTitle>
+        <PrizeGrid>
+          <PrizeCell>
+            <PrizeLabel>1등 당첨자</PrizeLabel>
+            <PrizeVal>
+              {data.firstWinners != null
+                ? `${data.firstWinners.toLocaleString()}명`
+                : '—'}
+            </PrizeVal>
+          </PrizeCell>
+          <PrizeCell>
+            <PrizeLabel>1등 당첨금 (1인당)</PrizeLabel>
+            <PrizeVal>{formatPrize(data.firstAmount)}</PrizeVal>
+          </PrizeCell>
+          <PrizeCell>
+            <PrizeLabel>2등 당첨자</PrizeLabel>
+            <PrizeVal>
+              {data.secondWinners != null
+                ? `${data.secondWinners.toLocaleString()}명`
+                : '—'}
+            </PrizeVal>
+          </PrizeCell>
+          <PrizeCell>
+            <PrizeLabel>2등 당첨금 (1인당)</PrizeLabel>
+            <PrizeVal>{formatPrize(data.secondAmount)}</PrizeVal>
+          </PrizeCell>
+        </PrizeGrid>
+      </PrizeBox>
+    )}
+    </>
   );
 }
 
@@ -185,6 +237,11 @@ const SumChip = styled.span`
   padding: 4px 8px;
   margin: 0 4px;
   white-space: nowrap;
+  @media (max-width: 640px) {
+    font-size: 11px;
+    padding: 3px 6px;
+    margin: 0 2px;
+  }
 `;
 const Loading = styled.div`
   text-align: center;
@@ -261,6 +318,10 @@ const BallRow = styled.div`
   gap: 6px;
   margin: 18px 0 16px;
   flex-wrap: wrap;
+  @media (max-width: 640px) {
+    gap: 4px;
+    margin: 10px 0 8px;
+  }
 `;
 const Ball = styled.span`
   width: 36px;
@@ -273,13 +334,23 @@ const Ball = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   ${(p) => p.$bonus && `border: 2px solid ${p.theme.text};`}
+  @media (max-width: 640px) {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
 `;
 const Plus = styled.span`
   font-size: 16px;
   font-weight: 600;
   color: ${(p) => p.theme.textMuted};
   margin: 0 4px;
+  @media (max-width: 640px) {
+    font-size: 13px;
+    margin: 0 2px;
+  }
 `;
 const RankRow = styled.div`
   display: flex;
@@ -297,4 +368,39 @@ const RankChip = styled.div`
 const RankVal = styled.b`
   color: ${(p) => p.theme.text};
   margin-left: 4px;
+`;
+const PrizeBox = styled.div`
+  background: ${(p) => p.theme.bgElevated};
+  border: 1px solid ${(p) => p.theme.border};
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+`;
+const PrizeTitle = styled.div`
+  font-size: 13px;
+  font-weight: 700;
+  color: ${(p) => p.theme.textMuted};
+  margin-bottom: 12px;
+`;
+const PrizeGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+const PrizeCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+const PrizeLabel = styled.span`
+  font-size: 12px;
+  color: ${(p) => p.theme.textMuted};
+`;
+const PrizeVal = styled.span`
+  font-size: 15px;
+  font-weight: 700;
+  color: ${(p) => p.theme.text};
 `;

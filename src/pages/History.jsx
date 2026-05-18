@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { getBallColor, fetchLottoHistory } from '../lib/lotto';
+import { getBallColor, fetchLottoHistory, formatPrize, countOdd } from '../lib/lotto';
 
 // 각 회차 당첨조합이 역대 전체에서 2~5등에 몇 번 해당했는지 계산.
 // (1등은 자기 자신 = 항상 1이라 생략)
@@ -19,12 +19,19 @@ function computeRoundStats(history) {
         else if (matched === 4) r4++;
         else if (matched === 3) r5++;
       }
+      const odd = countOdd(nums);
       return {
         round: cur.회차,
         numbers: nums,
         bonus: cur.보너스,
         sum: nums.reduce((a, b) => a + b, 0),
+        odd,
+        even: 6 - odd,
         r1, r2, r3, r4, r5,
+        firstAmount: cur['1등당첨금'],
+        firstWinners: cur['1등당첨자'],
+        secondAmount: cur['2등당첨금'],
+        secondWinners: cur['2등당첨자'],
       };
     })
     .sort((a, b) => b.round - a.round);
@@ -110,11 +117,16 @@ export default function History() {
                   <Th>당첨 번호</Th>
                   <Th>보너스</Th>
                   <Th>합</Th>
+                  <Th>홀:짝</Th>
                   <Th>1등</Th>
                   <Th>2등</Th>
                   <Th>3등</Th>
                   <Th>4등</Th>
                   <Th>5등</Th>
+                  <Th>1등 당첨자</Th>
+                  <Th>1등 당첨금</Th>
+                  <Th>2등 당첨자</Th>
+                  <Th>2등 당첨금</Th>
                 </tr>
               </thead>
               <tbody>
@@ -136,11 +148,24 @@ export default function History() {
                       </Ball>
                     </Td>
                     <Td>{s.sum}</Td>
+                    <Td>{s.odd}:{s.even}</Td>
                     <Td>{s.r1}</Td>
                     <Td>{s.r2}</Td>
                     <Td>{s.r3}</Td>
                     <Td>{s.r4}</Td>
                     <Td>{s.r5}</Td>
+                    <Td>
+                      {s.firstWinners != null
+                        ? `${s.firstWinners.toLocaleString()}명`
+                        : '—'}
+                    </Td>
+                    <Td>{formatPrize(s.firstAmount, { compact: true })}</Td>
+                    <Td>
+                      {s.secondWinners != null
+                        ? `${s.secondWinners.toLocaleString()}명`
+                        : '—'}
+                    </Td>
+                    <Td>{formatPrize(s.secondAmount, { compact: true })}</Td>
                   </tr>
                 ))}
               </tbody>
@@ -226,14 +251,27 @@ const CountText = styled.p`
   color: ${(p) => p.theme.textMuted};
 `;
 const TableWrap = styled.div`
-  overflow-x: auto;
   border: 1px solid ${(p) => p.theme.border};
   border-radius: 12px;
+  /* 모바일 / 좁은 화면: 가로 스크롤 허용 */
+  @media (max-width: 920px) {
+    overflow-x: auto;
+  }
+  /* PC: Layout의 920px 컨테이너 폭을 넘어 더 넓게 확장 → 스크롤 없이 모든 컬럼 표시 */
+  @media (min-width: 921px) {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1280px, calc(100vw - 40px));
+  }
 `;
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  @media (min-width: 921px) {
+    font-size: 13px;
+  }
 `;
 const Th = styled.th`
   background: ${(p) => p.theme.bgElevated};
@@ -244,6 +282,10 @@ const Th = styled.th`
   text-align: center;
   white-space: nowrap;
   border-bottom: 1px solid ${(p) => p.theme.border};
+  @media (min-width: 921px) {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
 `;
 const Td = styled.td`
   padding: 10px;
@@ -251,6 +293,9 @@ const Td = styled.td`
   white-space: nowrap;
   border-bottom: 1px solid ${(p) => p.theme.border};
   color: ${(p) => p.theme.text};
+  @media (min-width: 921px) {
+    padding: 8px 6px;
+  }
 `;
 const Balls = styled.div`
   display: flex;
