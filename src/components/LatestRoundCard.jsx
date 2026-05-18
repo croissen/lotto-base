@@ -319,7 +319,7 @@ const BallRow = styled.div`
   margin: 18px 0 16px;
   flex-wrap: wrap;
   @media (max-width: 640px) {
-    gap: 4px;
+    gap: 0px;
     margin: 10px 0 8px;
   }
 `;
@@ -387,7 +387,7 @@ const PrizeGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 10px 16px;
   @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  
   }
 `;
 const PrizeCell = styled.div`
