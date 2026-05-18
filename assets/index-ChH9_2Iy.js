@@ -480,7 +480,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   margin: 18px 0 16px;
   flex-wrap: wrap;
   @media (max-width: 640px) {
-    gap: 4px;
+    gap: 0px;
     margin: 10px 0 8px;
   }
 `,jf=R.span`
@@ -540,7 +540,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   grid-template-columns: 1fr 1fr;
   gap: 10px 16px;
   @media (max-width: 480px) {
-    grid-template-columns: 1fr;
+  
   }
 `,zf=R.div`
   display: flex;
