@@ -5,9 +5,14 @@ import { supabase } from '../lib/supabase';
 import { maskToNumbers, numbersToMask, getBallColor } from '../lib/lotto';
 import { hasValidPass } from '../lib/pass';
 import AdGateModal from '../components/AdGateModal';
+import AdBanner from '../components/AdBanner';
 import LatestRoundCard from '../components/LatestRoundCard';
 import GuideModal from '../components/GuideModal';
 import { useLatestRound } from '../lib/useLatestRound';
+import { useMediaQuery } from '../lib/useMediaQuery';
+
+// 초기 트래픽 확보 단계: 쿠팡 게이트 비활성화. 트래픽 쌓이면 true로 복원.
+const REQUIRE_PASS = false;
 
 const TOTAL = 8145060; // C(45,6)
 const RANK_LABELS = [
@@ -35,6 +40,16 @@ function parseRange(min, max, hardMax) {
   if (lo !== null && hi === null) return [lo, lo];
   if (lo === null && hi !== null) return [0, hi];
   return [lo, hi];
+}
+
+// 연구실 페이지 하단 광고: PC는 728x90 leaderboard, 모바일은 300x250 미디엄 렉탱글
+function LabBottomAd() {
+  const isPC = useMediaQuery('(min-width: 768px)');
+  return isPC ? (
+    <AdBanner adUnitId="DAN-LTlTtZD1881wAyvL" width={728} height={90} />
+  ) : (
+    <AdBanner adUnitId="DAN-HwGGOc8XiVMKgJJX" width={300} height={250} />
+  );
 }
 
 export default function Lab() {
@@ -144,10 +159,13 @@ export default function Lab() {
     };
   }
 
-  // 확률 줄이기 버튼 클릭 → 이용권 있으면 바로 실행, 없으면 광고 게이트
+  // 확률 줄이기 버튼 클릭 → REQUIRE_PASS=false면 바로 실행
   const handleReduceClick = () => {
-    if (hasValidPass()) runReduce();
-    else setShowGate(true);
+    if (REQUIRE_PASS && !hasValidPass()) {
+      setShowGate(true);
+    } else {
+      runReduce();
+    }
   };
 
   const runReduce = async () => {
@@ -438,6 +456,8 @@ export default function Lab() {
           )}
         </ResultCard>
       )}
+
+      <LabBottomAd />
 
       {showGate && (
         <AdGateModal

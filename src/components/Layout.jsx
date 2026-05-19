@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from './Header';
 import Footer from './Footer';
-import AdBanner from './AdBanner';
 import SideAds from './SideAds';
 import FloatingButtons from './FloatingButtons';
 
@@ -13,7 +12,6 @@ export default function Layout() {
       <Main>
         <Outlet />
       </Main>
-      <AdBanner />
       <Footer />
       <SideAds />
       <FloatingButtons />

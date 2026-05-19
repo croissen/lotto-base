@@ -1,11 +1,7 @@
 import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-const AD_UNIT_ID = 'DAN-HwGGOc8XiVMKgJJX';
-const AD_WIDTH = 300;
-const AD_HEIGHT = 250;
-
-export default function AdBanner() {
+export default function AdBanner({ adUnitId, width, height }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -15,9 +11,9 @@ export default function AdBanner() {
     const ins = document.createElement('ins');
     ins.className = 'kakao_ad_area';
     ins.style.display = 'none';
-    ins.setAttribute('data-ad-unit', AD_UNIT_ID);
-    ins.setAttribute('data-ad-width', String(AD_WIDTH));
-    ins.setAttribute('data-ad-height', String(AD_HEIGHT));
+    ins.setAttribute('data-ad-unit', adUnitId);
+    ins.setAttribute('data-ad-width', String(width));
+    ins.setAttribute('data-ad-height', String(height));
 
     const script = document.createElement('script');
     script.src = '//t1.kakaocdn.net/kas/static/ba.min.js';
@@ -29,12 +25,12 @@ export default function AdBanner() {
     return () => {
       container.innerHTML = '';
     };
-  }, []);
+  }, [adUnitId, width, height]);
 
   return (
     <Wrap>
       <Inner>
-        <Slot ref={containerRef} />
+        <Slot ref={containerRef} $w={width} $h={height} />
       </Inner>
     </Wrap>
   );
@@ -56,7 +52,7 @@ const Inner = styled.div`
 `;
 
 const Slot = styled.div`
-  width: ${AD_WIDTH}px;
-  height: ${AD_HEIGHT}px;
+  width: ${(p) => p.$w}px;
+  height: ${(p) => p.$h}px;
   max-width: 100%;
 `;
