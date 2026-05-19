@@ -34,7 +34,7 @@ export default function AdGateModal({ onClose, onPass }) {
         <VisitBtn onClick={handleVisit}>1시간 이용권 받기 →</VisitBtn>
 
         <FinePrint>
-          
+
         </FinePrint>
       </Modal>
     </Backdrop>

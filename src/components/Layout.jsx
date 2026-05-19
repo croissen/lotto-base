@@ -1,6 +1,8 @@
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from './Header';
+import Footer from './Footer';
+import AdBanner from './AdBanner';
 import FloatingButtons from './FloatingButtons';
 
 export default function Layout() {
@@ -10,6 +12,8 @@ export default function Layout() {
       <Main>
         <Outlet />
       </Main>
+      <AdBanner />
+      <Footer />
       <FloatingButtons />
     </Shell>
   );

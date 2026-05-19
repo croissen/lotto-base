@@ -31,7 +31,7 @@ export default function Home() {
       </Chips>
 
       <Disclaimer>
-        본 서비스는 역대 통계 기반 번호 생성 도구이며, 당첨을 보장하지 않습니다.
+       
       </Disclaimer>
     </Hero>
   );
