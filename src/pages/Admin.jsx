@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { supabase } from '../lib/supabase';
 import {
@@ -8,14 +8,46 @@ import {
 import { useLatestRound } from '../lib/useLatestRound';
 import { getVisitStats } from '../lib/visits';
 
-/* 방문자 통계 섹션 */
-function VisitStats() {
+/* 일별 PV 막대 그래프 */
+function BarChart({ data }) {
+  // 오래된 순으로 정렬 (좌→우 = 과거→오늘)
+  const sorted = [...data].sort((a, b) => a.date.localeCompare(b.date));
+  const max = Math.max(...sorted.map((d) => d.count), 1);
+
+  if (sorted.length === 0) {
+    return <ChartEmpty>데이터가 아직 없습니다.</ChartEmpty>;
+  }
+
+  return (
+    <ChartWrap>
+      {sorted.map((d) => {
+        const heightPct = (d.count / max) * 100;
+        const mmdd = d.date.slice(5); // MM-DD
+        return (
+          <BarColumn key={d.date}>
+            <BarVal>{d.count}</BarVal>
+            <BarRail>
+              <BarFill style={{ height: `${heightPct}%` }} />
+            </BarRail>
+            <BarLabel>{mmdd}</BarLabel>
+          </BarColumn>
+        );
+      })}
+    </ChartWrap>
+  );
+}
+
+/* 방문자 통계 화면 — 그래프 + 일별 상세 + 새로고침 */
+function VisitStatsScreen({ onBack }) {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [days, setDays] = useState(7);
 
-  useEffect(() => {
-    getVisitStats(30)
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    getVisitStats(days)
       .then((data) => {
         setStats(data);
         setLoading(false);
@@ -24,25 +56,38 @@ function VisitStats() {
         setError(err.message ?? String(err));
         setLoading(false);
       });
-  }, []);
+  }, [days]);
 
-  if (loading) {
-    return <StatsBox>방문자 통계 로딩 중...</StatsBox>;
-  }
-  if (error) {
-    return <StatsBox>통계 로드 실패: {error}</StatsBox>;
-  }
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const today = stats.find((s) => s.date === todayStr);
   const total = stats.reduce((sum, s) => sum + s.count, 0);
   const uniqueTotal = stats.reduce((sum, s) => sum + s.unique_count, 0);
-  const days = stats.length;
-  const avgPerDay = days > 0 ? Math.round(total / days) : 0;
+  const dayCount = stats.length;
+  const avgPerDay = dayCount > 0 ? Math.round(total / dayCount) : 0;
 
   return (
-    <StatsBox>
-      <StatsTitle>📊 방문자 통계</StatsTitle>
+    <ScreenWrap>
+      <ScreenHeader>
+        <BackBtn onClick={onBack}>← 메뉴</BackBtn>
+        <ScreenTitle>방문자 통계</ScreenTitle>
+        <RefreshBtn onClick={load} disabled={loading}>
+          {loading ? '...' : '↻'}
+        </RefreshBtn>
+      </ScreenHeader>
+
+      <RangeToggle>
+        {[7, 14, 30].map((n) => (
+          <RangeBtn key={n} $active={days === n} onClick={() => setDays(n)}>
+            {n}일
+          </RangeBtn>
+        ))}
+      </RangeToggle>
+
+      {error && <ErrorMsg>통계 로드 실패: {error}</ErrorMsg>}
 
       <SummaryGrid>
         <SummaryCell>
@@ -51,16 +96,25 @@ function VisitStats() {
           <SummarySub>유니크 {today?.unique_count ?? 0}명</SummarySub>
         </SummaryCell>
         <SummaryCell>
-          <SummaryLabel>최근 {days}일 총 PV</SummaryLabel>
+          <SummaryLabel>총 {dayCount}일 PV</SummaryLabel>
           <SummaryValue>{total.toLocaleString()}</SummaryValue>
           <SummarySub>유니크 {uniqueTotal.toLocaleString()}</SummarySub>
         </SummaryCell>
         <SummaryCell>
           <SummaryLabel>일평균 PV</SummaryLabel>
           <SummaryValue>{avgPerDay.toLocaleString()}</SummaryValue>
-          <SummarySub>최근 {days}일 기준</SummarySub>
+          <SummarySub>{dayCount}일 기준</SummarySub>
         </SummaryCell>
       </SummaryGrid>
+
+      <ChartCard>
+        <ChartTitle>일별 PV 추이 (최근 {days}일)</ChartTitle>
+        {loading ? (
+          <ChartEmpty>로딩 중...</ChartEmpty>
+        ) : (
+          <BarChart data={stats} />
+        )}
+      </ChartCard>
 
       <DailyList>
         <DailyTitle>일별 상세</DailyTitle>
@@ -76,11 +130,11 @@ function VisitStats() {
           ))
         )}
       </DailyList>
-    </StatsBox>
+    </ScreenWrap>
   );
 }
 
-/* 3단계 비밀번호 → 회차 추가 폼 */
+/* 3단계 비밀번호 → 메뉴 (통계 / 회차 추가) */
 export default function Admin() {
   // 인증 진행 단계: 1, 2, 3, 'authed'
   const [stage, setStage] = useState(1);
@@ -89,6 +143,34 @@ export default function Admin() {
   const [pw3, setPw3] = useState('');
   const [authError, setAuthError] = useState(null);
   const [verifying, setVerifying] = useState(false);
+
+  // 인증 통과 후 화면 모드
+  const [view, setView] = useState('menu'); // 'menu' | 'stats' | 'addround'
+
+  // 메뉴 화면의 "일일 조회수: N" 표시용
+  const [todayCount, setTodayCount] = useState(null);
+  const [todayLoading, setTodayLoading] = useState(false);
+
+  const loadTodayCount = useCallback(async () => {
+    setTodayLoading(true);
+    try {
+      const data = await getVisitStats(1);
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const today = data.find((s) => s.date === todayStr);
+      setTodayCount(today?.count ?? 0);
+    } catch {
+      setTodayCount(null);
+    } finally {
+      setTodayLoading(false);
+    }
+  }, []);
+
+  // 인증 통과 시 / 메뉴로 돌아올 때마다 오늘 조회수 갱신
+  useEffect(() => {
+    if (stage === 'authed' && view === 'menu') {
+      loadTodayCount();
+    }
+  }, [stage, view, loadTodayCount]);
 
   // 회차 추가 폼 상태
   const latestRound = useLatestRound();
@@ -265,14 +347,62 @@ export default function Admin() {
     );
   }
 
+  // 메뉴 화면
+  if (view === 'menu') {
+    return (
+      <Wrap>
+        <Hidden>
+          <h1>관리자 메뉴</h1>
+        </Hidden>
+        <MenuList>
+          <MenuBtn onClick={() => setView('stats')}>
+            <MenuBtnIcon>📊</MenuBtnIcon>
+            <MenuBtnText>
+              <MenuBtnLabel>일일 조회수</MenuBtnLabel>
+              <MenuBtnValue>
+                {todayLoading
+                  ? '...'
+                  : todayCount === null
+                  ? '로드 실패'
+                  : todayCount.toLocaleString()}
+              </MenuBtnValue>
+            </MenuBtnText>
+            <MenuBtnArrow>›</MenuBtnArrow>
+          </MenuBtn>
+
+          <MenuBtn onClick={() => setView('addround')}>
+            <MenuBtnIcon>✏️</MenuBtnIcon>
+            <MenuBtnText>
+              <MenuBtnLabel>회차 데이터 추가하기</MenuBtnLabel>
+              <MenuBtnValue>최신 회차: {latestRound ?? '...'}회</MenuBtnValue>
+            </MenuBtnText>
+            <MenuBtnArrow>›</MenuBtnArrow>
+          </MenuBtn>
+        </MenuList>
+      </Wrap>
+    );
+  }
+
+  // 통계 화면
+  if (view === 'stats') {
+    return (
+      <Wrap>
+        <VisitStatsScreen onBack={() => setView('menu')} />
+      </Wrap>
+    );
+  }
+
+  // 회차 추가 화면 (기존)
   return (
     <Wrap>
+      <ScreenHeader>
+        <BackBtn onClick={() => setView('menu')}>← 메뉴</BackBtn>
+        <ScreenTitle>회차 추가</ScreenTitle>
+        <ScreenSpacer />
+      </ScreenHeader>
       <Hidden>
-        <h1>회차 추가</h1>
         <Sub>최신 회차: {latestRound ?? '...'}회</Sub>
       </Hidden>
-
-      <VisitStats />
 
       <FormWide onSubmit={handleAddRound}>
         <Row>
@@ -564,7 +694,192 @@ const PrizeSub = styled.span`
   color: ${(p) => p.theme.textMuted};
 `;
 
-/* 방문자 통계 styled */
+/* 메뉴 화면 styled */
+const MenuList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+`;
+const MenuBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid ${(p) => p.theme.border};
+  background: ${(p) => p.theme.bgElevated};
+  color: ${(p) => p.theme.text};
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s ease, transform 0.05s ease;
+  &:hover {
+    background: ${(p) => p.theme.bgHover};
+  }
+  &:active {
+    transform: scale(0.99);
+  }
+`;
+const MenuBtnIcon = styled.div`
+  font-size: 28px;
+  flex-shrink: 0;
+`;
+const MenuBtnText = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+const MenuBtnLabel = styled.div`
+  font-size: 15px;
+  font-weight: 700;
+`;
+const MenuBtnValue = styled.div`
+  font-size: 13px;
+  color: ${(p) => p.theme.textMuted};
+`;
+const MenuBtnArrow = styled.div`
+  font-size: 24px;
+  color: ${(p) => p.theme.textMuted};
+  flex-shrink: 0;
+`;
+
+/* 화면 헤더 (뒤로가기/제목/새로고침) */
+const ScreenWrap = styled.div``;
+const ScreenHeader = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+`;
+const ScreenTitle = styled.h2`
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+`;
+const ScreenSpacer = styled.div`
+  width: 60px;
+`;
+const BackBtn = styled.button`
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid ${(p) => p.theme.border};
+  background: ${(p) => p.theme.bgInput};
+  color: ${(p) => p.theme.text};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover {
+    background: ${(p) => p.theme.bgHover};
+  }
+`;
+const RefreshBtn = styled.button`
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid ${(p) => p.theme.border};
+  background: ${(p) => p.theme.bgInput};
+  color: ${(p) => p.theme.text};
+  font-size: 18px;
+  cursor: pointer;
+  &:hover:not(:disabled) {
+    background: ${(p) => p.theme.bgHover};
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+`;
+
+/* 기간 토글 */
+const RangeToggle = styled.div`
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+`;
+const RangeBtn = styled.button`
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid
+    ${(p) => (p.$active ? p.theme.accent : p.theme.border)};
+  background: ${(p) =>
+    p.$active ? p.theme.accentSoft : p.theme.bgInput};
+  color: ${(p) => (p.$active ? p.theme.accent : p.theme.textMuted)};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover {
+    color: ${(p) => p.theme.text};
+  }
+`;
+
+/* 그래프 카드 */
+const ChartCard = styled.div`
+  background: ${(p) => p.theme.bgElevated};
+  border: 1px solid ${(p) => p.theme.border};
+  border-radius: 14px;
+  padding: 18px 16px;
+  margin-bottom: 18px;
+`;
+const ChartTitle = styled.div`
+  font-size: 13px;
+  font-weight: 700;
+  color: ${(p) => p.theme.textMuted};
+  margin-bottom: 16px;
+`;
+const ChartWrap = styled.div`
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 180px;
+  padding: 0 4px;
+`;
+const ChartEmpty = styled.div`
+  padding: 40px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: ${(p) => p.theme.textMuted};
+`;
+const BarColumn = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+`;
+const BarVal = styled.div`
+  font-size: 11px;
+  font-weight: 700;
+  color: ${(p) => p.theme.text};
+  margin-bottom: 4px;
+`;
+const BarRail = styled.div`
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  background: ${(p) => p.theme.bgInput};
+  border-radius: 4px;
+  overflow: hidden;
+`;
+const BarFill = styled.div`
+  width: 100%;
+  background: ${(p) => p.theme.accent};
+  border-radius: 4px;
+  min-height: 2px;
+  transition: height 0.3s ease;
+`;
+const BarLabel = styled.div`
+  font-size: 10px;
+  color: ${(p) => p.theme.textMuted};
+  margin-top: 6px;
+  white-space: nowrap;
+`;
+
+/* 통계 박스 (요약) */
 const StatsBox = styled.div`
   background: ${(p) => p.theme.bgElevated};
   border: 1px solid ${(p) => p.theme.border};
