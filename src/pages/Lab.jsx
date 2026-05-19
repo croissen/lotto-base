@@ -6,6 +6,7 @@ import { maskToNumbers, numbersToMask, getBallColor } from '../lib/lotto';
 import { hasValidPass } from '../lib/pass';
 import AdGateModal from '../components/AdGateModal';
 import AdBanner from '../components/AdBanner';
+import MobileInlineAd from '../components/MobileInlineAd';
 import LatestRoundCard from '../components/LatestRoundCard';
 import GuideModal from '../components/GuideModal';
 import { useLatestRound } from '../lib/useLatestRound';
@@ -234,6 +235,8 @@ export default function Lab() {
       </PageDesc>
 
       <LatestRoundCard />
+
+      <MobileInlineAd />
 
       {/* 1. 등수 범위 */}
       <Card>

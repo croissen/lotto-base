@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { getBallColor, fetchLottoHistory, formatPrize, countOdd } from '../lib/lotto';
+import MobileInlineAd from '../components/MobileInlineAd';
 
 // 각 회차 당첨조합이 역대 전체에서 2~5등에 몇 번 해당했는지 계산.
 // (1등은 자기 자신 = 항상 1이라 생략)
@@ -105,6 +106,9 @@ export default function History() {
               <HistResetBtn onClick={resetFilters}>초기화</HistResetBtn>
             </FilterItem>
           </FilterBar>
+
+          <MobileInlineAd />
+
           <CountText>
             {filtered.length.toLocaleString()}개 회차 표시 중
           </CountText>
