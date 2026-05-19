@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Header from './Header';
 import Footer from './Footer';
 import AdBanner from './AdBanner';
+import SideAds from './SideAds';
 import FloatingButtons from './FloatingButtons';
 
 export default function Layout() {
@@ -14,6 +15,7 @@ export default function Layout() {
       </Main>
       <AdBanner />
       <Footer />
+      <SideAds />
       <FloatingButtons />
     </Shell>
   );
