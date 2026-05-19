@@ -1259,12 +1259,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   justify-content: center;
   flex-shrink: 0;
   ${e=>e.$bonus&&`border: 2px solid ${e.theme.text};`}
-`;function yh(){let[e,t]=(0,x.useState)([]),[n,r]=(0,x.useState)(!0),[i,a]=(0,x.useState)(null);if((0,x.useEffect)(()=>{Bd(30).then(e=>{t(e),r(!1)}).catch(e=>{a(e.message??String(e)),r(!1)})},[]),n)return(0,z.jsx)(Wh,{children:`방문자 통계 로딩 중...`});if(i)return(0,z.jsxs)(Wh,{children:[`통계 로드 실패: `,i]});let o=new Date().toISOString().slice(0,10),s=e.find(e=>e.date===o),c=e.reduce((e,t)=>e+t.count,0),l=e.reduce((e,t)=>e+t.unique_count,0),u=e.length,d=u>0?Math.round(c/u):0;return(0,z.jsxs)(Wh,{children:[(0,z.jsx)(Gh,{children:`📊 방문자 통계`}),(0,z.jsxs)(Kh,{children:[(0,z.jsxs)(qh,{children:[(0,z.jsx)(Jh,{children:`오늘 PV`}),(0,z.jsx)(Yh,{children:(s?.count??0).toLocaleString()}),(0,z.jsxs)(Xh,{children:[`유니크 `,s?.unique_count??0,`명`]})]}),(0,z.jsxs)(qh,{children:[(0,z.jsxs)(Jh,{children:[`최근 `,u,`일 총 PV`]}),(0,z.jsx)(Yh,{children:c.toLocaleString()}),(0,z.jsxs)(Xh,{children:[`유니크 `,l.toLocaleString()]})]}),(0,z.jsxs)(qh,{children:[(0,z.jsx)(Jh,{children:`일평균 PV`}),(0,z.jsx)(Yh,{children:d.toLocaleString()}),(0,z.jsxs)(Xh,{children:[`최근 `,u,`일 기준`]})]})]}),(0,z.jsxs)(Zh,{children:[(0,z.jsx)(Qh,{children:`일별 상세`}),e.length===0?(0,z.jsx)($h,{children:`아직 기록이 없습니다.`}):e.map(e=>(0,z.jsxs)(eg,{children:[(0,z.jsx)(tg,{children:e.date}),(0,z.jsxs)(ng,{children:[`PV `,e.count.toLocaleString()]}),(0,z.jsxs)(ng,{children:[`유니크 `,e.unique_count.toLocaleString()]})]},e.date))]})]})}function bh(){let[e,t]=(0,x.useState)(1),[n,r]=(0,x.useState)(``),[i,a]=(0,x.useState)(``),[o,s]=(0,x.useState)(``),[c,l]=(0,x.useState)(null),[u,d]=(0,x.useState)(!1),f=vp(),[p,m]=(0,x.useState)(``),[h,g]=(0,x.useState)([``,``,``,``,``,``]),[_,v]=(0,x.useState)(``),[y,b]=(0,x.useState)(``),[S,C]=(0,x.useState)(``),[w,T]=(0,x.useState)(``),[E,ee]=(0,x.useState)(``),[D,te]=(0,x.useState)(!1),[ne,re]=(0,x.useState)(null);(0,x.useEffect)(()=>{f&&!p&&m(String(f+1))},[f]);let ie=async(e,t)=>{let n=String(t).trim(),{data:r,error:i}=await Ld.rpc(`verify_admin_password`,{p_stage:e,p_password:n});if(i)throw i;return r===!0},ae=async c=>{c.preventDefault(),l(null),d(!0);let u=e===1?n:e===2?i:o;try{if(await ie(e,u)){let n=String(u).trim();e===1?r(n):e===2?a(n):s(n),t(e<3?e+1:`authed`)}else l(`${e}차 비밀번호가 일치하지 않습니다`)}catch(e){l(e.message??String(e))}finally{d(!1)}},oe=(e,t)=>{let n=[...h];n[e]=t.replace(/[^0-9]/g,``).slice(0,2),g(n)};return e===`authed`?(0,z.jsxs)(Sh,{children:[(0,z.jsxs)(Ch,{children:[(0,z.jsx)(`h1`,{children:`회차 추가`}),(0,z.jsxs)(wh,{children:[`최신 회차: `,f??`...`,`회`]})]}),(0,z.jsx)(yh,{}),(0,z.jsxs)(Eh,{onSubmit:async e=>{e.preventDefault(),re(null);let t=parseInt(p,10),r=h.map(e=>parseInt(e,10)),a=parseInt(_,10);if(!Number.isFinite(t)||t<1){re({ok:!1,text:`회차 번호를 확인해주세요`});return}if(r.some(e=>!Number.isFinite(e)||e<1||e>45)){re({ok:!1,text:`본번호 6개를 1~45 사이로 입력해주세요`});return}if(new Set(r).size!==6){re({ok:!1,text:`본번호 6개가 서로 달라야 합니다`});return}if(!Number.isFinite(a)||a<1||a>45){re({ok:!1,text:`보너스 번호를 1~45 사이로 입력해주세요`});return}if(r.includes(a)){re({ok:!1,text:`보너스 번호가 본번호와 같습니다`});return}let s=e=>{let t=String(e).replace(/[^0-9]/g,``).trim();return t===``?null:parseInt(t,10)},c=s(y),l=s(S),u=s(w),d=s(E);te(!0);try{let{data:e,error:s}=await Ld.rpc(`add_lotto_round`,{p_pw1:n,p_pw2:i,p_pw3:o,p_round_no:t,p_n1:r[0],p_n2:r[1],p_n3:r[2],p_n4:r[3],p_n5:r[4],p_n6:r[5],p_bonus:a,p_first_amount:c,p_first_winners:l,p_second_amount:u,p_second_winners:d});if(s)throw s;pf(),re({ok:!0,text:`${t}회차 추가 완료. 800만 조합 중 ${(e?.rows_updated??0).toLocaleString()}개 행 갱신됨.`}),m(String(t+1)),g([``,``,``,``,``,``]),v(``),b(``),C(``),T(``),ee(``)}catch(e){re({ok:!1,text:e.message??String(e)})}finally{te(!1)}},children:[(0,z.jsxs)(Oh,{children:[(0,z.jsx)(Dh,{children:`회차 번호`}),(0,z.jsx)(Ah,{type:`number`,value:p,onChange:e=>m(e.target.value),disabled:D})]}),(0,z.jsx)(Dh,{children:`본번호 6개 (1~45, 서로 다른 수)`}),(0,z.jsx)(jh,{children:h.map((e,t)=>(0,z.jsxs)(Mh,{children:[(0,z.jsx)(Ah,{type:`number`,inputMode:`numeric`,min:1,max:45,placeholder:`${t+1}`,value:e,onChange:e=>oe(t,e.target.value),disabled:D}),e&&Number(e)>=1&&Number(e)<=45&&(0,z.jsx)(Nh,{$color:lf(Number(e)),children:e})]},t))}),(0,z.jsxs)(Oh,{children:[(0,z.jsx)(Dh,{children:`보너스 번호`}),(0,z.jsxs)(Mh,{children:[(0,z.jsx)(Ah,{type:`number`,inputMode:`numeric`,min:1,max:45,placeholder:`보너스`,value:_,onChange:e=>v(e.target.value.replace(/[^0-9]/g,``).slice(0,2)),disabled:D}),_&&Number(_)>=1&&Number(_)<=45&&(0,z.jsx)(Nh,{$color:lf(Number(_)),$bonus:!0,children:_})]})]}),(0,z.jsx)(zh,{}),(0,z.jsxs)(Dh,{children:[`당첨금 정보 `,(0,z.jsx)(Bh,{children:`(선택 — 동행복권 발표 후 입력)`})]}),(0,z.jsxs)(Vh,{children:[(0,z.jsxs)(Hh,{children:[(0,z.jsx)(Uh,{children:`1등 당첨금 (1명당, 원)`}),(0,z.jsx)(Ah,{type:`text`,inputMode:`numeric`,placeholder:`예: 1857554133`,value:y,onChange:e=>b(e.target.value.replace(/[^0-9]/g,``)),disabled:D})]}),(0,z.jsxs)(Hh,{children:[(0,z.jsx)(Uh,{children:`1등 당첨자 수 (명)`}),(0,z.jsx)(Ah,{type:`text`,inputMode:`numeric`,placeholder:`예: 16`,value:S,onChange:e=>C(e.target.value.replace(/[^0-9]/g,``)),disabled:D})]}),(0,z.jsxs)(Hh,{children:[(0,z.jsx)(Uh,{children:`2등 당첨금 (1명당, 원)`}),(0,z.jsx)(Ah,{type:`text`,inputMode:`numeric`,placeholder:`예: 48092017`,value:w,onChange:e=>T(e.target.value.replace(/[^0-9]/g,``)),disabled:D})]}),(0,z.jsxs)(Hh,{children:[(0,z.jsx)(Uh,{children:`2등 당첨자 수 (명)`}),(0,z.jsx)(Ah,{type:`text`,inputMode:`numeric`,placeholder:`예: 103`,value:E,onChange:e=>ee(e.target.value.replace(/[^0-9]/g,``)),disabled:D})]})]}),(0,z.jsx)(Fh,{type:`submit`,disabled:D,children:D?`갱신 중... (800만 행 업데이트, 30~90초 소요)`:`회차 추가 + 확률 갱신`}),ne&&(0,z.jsx)(Lh,{$ok:ne.ok,children:ne.text}),(0,z.jsx)(Rh,{children:`제출하면 서버에서 800만 조합의 rank 카운트가 자동으로 갱신됩니다. 시간이 좀 걸리니 페이지를 닫지 말고 기다려주세요.`})]})]}):(0,z.jsxs)(Sh,{children:[(0,z.jsxs)(Ch,{children:[(0,z.jsx)(`h1`,{children:`인증`}),(0,z.jsxs)(wh,{children:[`관리자 페이지 — `,e,`차 / 3차`]})]}),(0,z.jsxs)(Th,{onSubmit:ae,children:[(0,z.jsxs)(Dh,{children:[e,`차 비밀번호`]}),(0,z.jsx)(kh,{type:`password`,inputMode:`numeric`,autoComplete:`off`,autoFocus:!0,value:e===1?n:e===2?i:o,onChange:t=>{let n=t.target.value;e===1?r(n):e===2?a(n):s(n)},disabled:u}),(0,z.jsx)(Ph,{type:`submit`,disabled:u,children:u?`확인 중...`:`확인`}),c&&(0,z.jsx)(Ih,{children:c})]})]})}var xh=Ya`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`,Sh=R.div`
+`;function yh({data:e}){let t=[...e].sort((e,t)=>e.date.localeCompare(t.date)),n=Math.max(...t.map(e=>e.count),1);return t.length===0?(0,z.jsx)(lg,{children:`데이터가 아직 없습니다.`}):(0,z.jsx)(cg,{children:t.map(e=>{let t=e.count/n*100,r=e.date.slice(5);return(0,z.jsxs)(ug,{children:[(0,z.jsx)(dg,{children:e.count}),(0,z.jsx)(fg,{children:(0,z.jsx)(pg,{style:{height:`${t}%`}})}),(0,z.jsx)(mg,{children:r})]},e.date)})})}function bh({onBack:e}){let[t,n]=(0,x.useState)([]),[r,i]=(0,x.useState)(!0),[a,o]=(0,x.useState)(null),[s,c]=(0,x.useState)(7),l=(0,x.useCallback)(()=>{i(!0),o(null),Bd(s).then(e=>{n(e),i(!1)}).catch(e=>{o(e.message??String(e)),i(!1)})},[s]);(0,x.useEffect)(()=>{l()},[l]);let u=new Date().toISOString().slice(0,10),d=t.find(e=>e.date===u),f=t.reduce((e,t)=>e+t.count,0),p=t.reduce((e,t)=>e+t.unique_count,0),m=t.length,h=m>0?Math.round(f/m):0;return(0,z.jsxs)(Qh,{children:[(0,z.jsxs)($h,{children:[(0,z.jsx)(ng,{onClick:e,children:`← 메뉴`}),(0,z.jsx)(eg,{children:`방문자 통계`}),(0,z.jsx)(rg,{onClick:l,disabled:r,children:r?`...`:`↻`})]}),(0,z.jsx)(ig,{children:[7,14,30].map(e=>(0,z.jsxs)(ag,{$active:s===e,onClick:()=>c(e),children:[e,`일`]},e))}),a&&(0,z.jsxs)(Lh,{children:[`통계 로드 실패: `,a]}),(0,z.jsxs)(hg,{children:[(0,z.jsxs)(gg,{children:[(0,z.jsx)(_g,{children:`오늘 PV`}),(0,z.jsx)(vg,{children:(d?.count??0).toLocaleString()}),(0,z.jsxs)(yg,{children:[`유니크 `,d?.unique_count??0,`명`]})]}),(0,z.jsxs)(gg,{children:[(0,z.jsxs)(_g,{children:[`총 `,m,`일 PV`]}),(0,z.jsx)(vg,{children:f.toLocaleString()}),(0,z.jsxs)(yg,{children:[`유니크 `,p.toLocaleString()]})]}),(0,z.jsxs)(gg,{children:[(0,z.jsx)(_g,{children:`일평균 PV`}),(0,z.jsx)(vg,{children:h.toLocaleString()}),(0,z.jsxs)(yg,{children:[m,`일 기준`]})]})]}),(0,z.jsxs)(og,{children:[(0,z.jsxs)(sg,{children:[`일별 PV 추이 (최근 `,s,`일)`]}),r?(0,z.jsx)(lg,{children:`로딩 중...`}):(0,z.jsx)(yh,{data:t})]}),(0,z.jsxs)(bg,{children:[(0,z.jsx)(xg,{children:`일별 상세`}),t.length===0?(0,z.jsx)(Sg,{children:`아직 기록이 없습니다.`}):t.map(e=>(0,z.jsxs)(Cg,{children:[(0,z.jsx)(wg,{children:e.date}),(0,z.jsxs)(Tg,{children:[`PV `,e.count.toLocaleString()]}),(0,z.jsxs)(Tg,{children:[`유니크 `,e.unique_count.toLocaleString()]})]},e.date))]})]})}function xh(){let[e,t]=(0,x.useState)(1),[n,r]=(0,x.useState)(``),[i,a]=(0,x.useState)(``),[o,s]=(0,x.useState)(``),[c,l]=(0,x.useState)(null),[u,d]=(0,x.useState)(!1),[f,p]=(0,x.useState)(`menu`),[m,h]=(0,x.useState)(null),[g,_]=(0,x.useState)(!1),v=(0,x.useCallback)(async()=>{_(!0);try{let e=await Bd(1),t=new Date().toISOString().slice(0,10);h(e.find(e=>e.date===t)?.count??0)}catch{h(null)}finally{_(!1)}},[]);(0,x.useEffect)(()=>{e===`authed`&&f===`menu`&&v()},[e,f,v]);let y=vp(),[b,S]=(0,x.useState)(``),[C,w]=(0,x.useState)([``,``,``,``,``,``]),[T,E]=(0,x.useState)(``),[ee,D]=(0,x.useState)(``),[te,ne]=(0,x.useState)(``),[re,ie]=(0,x.useState)(``),[ae,oe]=(0,x.useState)(``),[se,O]=(0,x.useState)(!1),[k,ce]=(0,x.useState)(null);(0,x.useEffect)(()=>{y&&!b&&S(String(y+1))},[y]);let le=async(e,t)=>{let n=String(t).trim(),{data:r,error:i}=await Ld.rpc(`verify_admin_password`,{p_stage:e,p_password:n});if(i)throw i;return r===!0},ue=async c=>{c.preventDefault(),l(null),d(!0);let u=e===1?n:e===2?i:o;try{if(await le(e,u)){let n=String(u).trim();e===1?r(n):e===2?a(n):s(n),t(e<3?e+1:`authed`)}else l(`${e}차 비밀번호가 일치하지 않습니다`)}catch(e){l(e.message??String(e))}finally{d(!1)}},de=(e,t)=>{let n=[...C];n[e]=t.replace(/[^0-9]/g,``).slice(0,2),w(n)};return e===`authed`?f===`menu`?(0,z.jsxs)(Ch,{children:[(0,z.jsx)(wh,{children:(0,z.jsx)(`h1`,{children:`관리자 메뉴`})}),(0,z.jsxs)(Gh,{children:[(0,z.jsxs)(Kh,{onClick:()=>p(`stats`),children:[(0,z.jsx)(qh,{children:`📊`}),(0,z.jsxs)(Jh,{children:[(0,z.jsx)(Yh,{children:`일일 조회수`}),(0,z.jsx)(Xh,{children:g?`...`:m===null?`로드 실패`:m.toLocaleString()})]}),(0,z.jsx)(Zh,{children:`›`})]}),(0,z.jsxs)(Kh,{onClick:()=>p(`addround`),children:[(0,z.jsx)(qh,{children:`✏️`}),(0,z.jsxs)(Jh,{children:[(0,z.jsx)(Yh,{children:`회차 데이터 추가하기`}),(0,z.jsxs)(Xh,{children:[`최신 회차: `,y??`...`,`회`]})]}),(0,z.jsx)(Zh,{children:`›`})]})]})]}):f===`stats`?(0,z.jsx)(Ch,{children:(0,z.jsx)(bh,{onBack:()=>p(`menu`)})}):(0,z.jsxs)(Ch,{children:[(0,z.jsxs)($h,{children:[(0,z.jsx)(ng,{onClick:()=>p(`menu`),children:`← 메뉴`}),(0,z.jsx)(eg,{children:`회차 추가`}),(0,z.jsx)(tg,{})]}),(0,z.jsx)(wh,{children:(0,z.jsxs)(Th,{children:[`최신 회차: `,y??`...`,`회`]})}),(0,z.jsxs)(Dh,{onSubmit:async e=>{e.preventDefault(),ce(null);let t=parseInt(b,10),r=C.map(e=>parseInt(e,10)),a=parseInt(T,10);if(!Number.isFinite(t)||t<1){ce({ok:!1,text:`회차 번호를 확인해주세요`});return}if(r.some(e=>!Number.isFinite(e)||e<1||e>45)){ce({ok:!1,text:`본번호 6개를 1~45 사이로 입력해주세요`});return}if(new Set(r).size!==6){ce({ok:!1,text:`본번호 6개가 서로 달라야 합니다`});return}if(!Number.isFinite(a)||a<1||a>45){ce({ok:!1,text:`보너스 번호를 1~45 사이로 입력해주세요`});return}if(r.includes(a)){ce({ok:!1,text:`보너스 번호가 본번호와 같습니다`});return}let s=e=>{let t=String(e).replace(/[^0-9]/g,``).trim();return t===``?null:parseInt(t,10)},c=s(ee),l=s(te),u=s(re),d=s(ae);O(!0);try{let{data:e,error:s}=await Ld.rpc(`add_lotto_round`,{p_pw1:n,p_pw2:i,p_pw3:o,p_round_no:t,p_n1:r[0],p_n2:r[1],p_n3:r[2],p_n4:r[3],p_n5:r[4],p_n6:r[5],p_bonus:a,p_first_amount:c,p_first_winners:l,p_second_amount:u,p_second_winners:d});if(s)throw s;pf(),ce({ok:!0,text:`${t}회차 추가 완료. 800만 조합 중 ${(e?.rows_updated??0).toLocaleString()}개 행 갱신됨.`}),S(String(t+1)),w([``,``,``,``,``,``]),E(``),D(``),ne(``),ie(``),oe(``)}catch(e){ce({ok:!1,text:e.message??String(e)})}finally{O(!1)}},children:[(0,z.jsxs)(kh,{children:[(0,z.jsx)(Oh,{children:`회차 번호`}),(0,z.jsx)(jh,{type:`number`,value:b,onChange:e=>S(e.target.value),disabled:se})]}),(0,z.jsx)(Oh,{children:`본번호 6개 (1~45, 서로 다른 수)`}),(0,z.jsx)(Mh,{children:C.map((e,t)=>(0,z.jsxs)(Nh,{children:[(0,z.jsx)(jh,{type:`number`,inputMode:`numeric`,min:1,max:45,placeholder:`${t+1}`,value:e,onChange:e=>de(t,e.target.value),disabled:se}),e&&Number(e)>=1&&Number(e)<=45&&(0,z.jsx)(Ph,{$color:lf(Number(e)),children:e})]},t))}),(0,z.jsxs)(kh,{children:[(0,z.jsx)(Oh,{children:`보너스 번호`}),(0,z.jsxs)(Nh,{children:[(0,z.jsx)(jh,{type:`number`,inputMode:`numeric`,min:1,max:45,placeholder:`보너스`,value:T,onChange:e=>E(e.target.value.replace(/[^0-9]/g,``).slice(0,2)),disabled:se}),T&&Number(T)>=1&&Number(T)<=45&&(0,z.jsx)(Ph,{$color:lf(Number(T)),$bonus:!0,children:T})]})]}),(0,z.jsx)(Bh,{}),(0,z.jsxs)(Oh,{children:[`당첨금 정보 `,(0,z.jsx)(Vh,{children:`(선택 — 동행복권 발표 후 입력)`})]}),(0,z.jsxs)(Hh,{children:[(0,z.jsxs)(Uh,{children:[(0,z.jsx)(Wh,{children:`1등 당첨금 (1명당, 원)`}),(0,z.jsx)(jh,{type:`text`,inputMode:`numeric`,placeholder:`예: 1857554133`,value:ee,onChange:e=>D(e.target.value.replace(/[^0-9]/g,``)),disabled:se})]}),(0,z.jsxs)(Uh,{children:[(0,z.jsx)(Wh,{children:`1등 당첨자 수 (명)`}),(0,z.jsx)(jh,{type:`text`,inputMode:`numeric`,placeholder:`예: 16`,value:te,onChange:e=>ne(e.target.value.replace(/[^0-9]/g,``)),disabled:se})]}),(0,z.jsxs)(Uh,{children:[(0,z.jsx)(Wh,{children:`2등 당첨금 (1명당, 원)`}),(0,z.jsx)(jh,{type:`text`,inputMode:`numeric`,placeholder:`예: 48092017`,value:re,onChange:e=>ie(e.target.value.replace(/[^0-9]/g,``)),disabled:se})]}),(0,z.jsxs)(Uh,{children:[(0,z.jsx)(Wh,{children:`2등 당첨자 수 (명)`}),(0,z.jsx)(jh,{type:`text`,inputMode:`numeric`,placeholder:`예: 103`,value:ae,onChange:e=>oe(e.target.value.replace(/[^0-9]/g,``)),disabled:se})]})]}),(0,z.jsx)(Ih,{type:`submit`,disabled:se,children:se?`갱신 중... (800만 행 업데이트, 30~90초 소요)`:`회차 추가 + 확률 갱신`}),k&&(0,z.jsx)(Rh,{$ok:k.ok,children:k.text}),(0,z.jsx)(zh,{children:`제출하면 서버에서 800만 조합의 rank 카운트가 자동으로 갱신됩니다. 시간이 좀 걸리니 페이지를 닫지 말고 기다려주세요.`})]})]}):(0,z.jsxs)(Ch,{children:[(0,z.jsxs)(wh,{children:[(0,z.jsx)(`h1`,{children:`인증`}),(0,z.jsxs)(Th,{children:[`관리자 페이지 — `,e,`차 / 3차`]})]}),(0,z.jsxs)(Eh,{onSubmit:ue,children:[(0,z.jsxs)(Oh,{children:[e,`차 비밀번호`]}),(0,z.jsx)(Ah,{type:`password`,inputMode:`numeric`,autoComplete:`off`,autoFocus:!0,value:e===1?n:e===2?i:o,onChange:t=>{let n=t.target.value;e===1?r(n):e===2?a(n):s(n)},disabled:u}),(0,z.jsx)(Fh,{type:`submit`,disabled:u,children:u?`확인 중...`:`확인`}),c&&(0,z.jsx)(Lh,{children:c})]})]})}var Sh=Ya`from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}`,Ch=R.div`
   max-width: 460px;
   margin: 0 auto;
   padding: 80px 20px;
-  animation: ${xh} 0.3s ease;
-`,Ch=R.div`
+  animation: ${Sh} 0.3s ease;
+`,wh=R.div`
   text-align: center;
   margin-bottom: 28px;
   h1 {
@@ -1272,23 +1272,23 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     font-weight: 800;
     letter-spacing: -0.5px;
   }
-`,wh=R.p`
+`,Th=R.p`
   color: ${e=>e.theme.textMuted};
   font-size: 13px;
   margin-top: 4px;
-`,Th=R.form`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 `,Eh=R.form`
   display: flex;
   flex-direction: column;
+  gap: 12px;
+`,Dh=R.form`
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-`,Dh=R.label`
+`,Oh=R.label`
   font-size: 13px;
   font-weight: 600;
   color: ${e=>e.theme.textMuted};
-`,Oh=R.div`
+`,kh=R.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1296,7 +1296,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     width: 90px;
     flex-shrink: 0;
   }
-`,kh=R.input`
+`,Ah=R.input`
   padding: 14px 16px;
   border-radius: 10px;
   border: 1px solid ${e=>e.theme.border};
@@ -1309,7 +1309,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     outline: none;
     border-color: ${e=>e.theme.accent};
   }
-`,Ah=R.input`
+`,jh=R.input`
   width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
@@ -1322,19 +1322,19 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
     outline: none;
     border-color: ${e=>e.theme.accent};
   }
-`,jh=R.div`
+`,Mh=R.div`
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 8px;
   @media (max-width: 480px) {
     grid-template-columns: repeat(3, 1fr);
   }
-`,Mh=R.div`
+`,Nh=R.div`
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-`,Nh=R.span`
+`,Ph=R.span`
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -1347,7 +1347,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   justify-content: center;
   flex-shrink: 0;
   ${e=>e.$bonus&&`border: 2px solid ${e.theme.text};`}
-`,Ph=R.button`
+`,Fh=R.button`
   padding: 13px;
   border-radius: 10px;
   border: none;
@@ -1361,61 +1361,213 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   &:hover:not(:disabled) {
     background: ${e=>e.theme.accentHover};
   }
-`,Fh=R(Ph)`
+`,Ih=R(Fh)`
   margin-top: 12px;
   padding: 15px;
-`,Ih=R.p`
+`,Lh=R.p`
   margin-top: 4px;
   color: ${e=>e.theme.danger};
   font-size: 13px;
   text-align: center;
-`,Lh=R.div`
+`,Rh=R.div`
   margin-top: 8px;
   padding: 14px;
   border-radius: 10px;
   font-size: 14px;
   background: ${e=>e.$ok?e.theme.success+`22`:e.theme.danger+`22`};
   color: ${e=>e.$ok?e.theme.success:e.theme.danger};
-`,Rh=R.p`
+`,zh=R.p`
   margin-top: 8px;
   font-size: 12px;
   color: ${e=>e.theme.textMuted};
   line-height: 1.6;
-`,zh=R.div`
+`,Bh=R.div`
   height: 1px;
   background: ${e=>e.theme.border};
   margin: 8px 0;
-`,Bh=R.span`
+`,Vh=R.span`
   font-size: 11px;
   font-weight: 500;
   color: ${e=>e.theme.textMuted};
   margin-left: 4px;
-`,Vh=R.div`
+`,Hh=R.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
-`,Hh=R.div`
+`,Uh=R.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-`,Uh=R.span`
+`,Wh=R.span`
   font-size: 11px;
   font-weight: 600;
   color: ${e=>e.theme.textMuted};
-`,Wh=R.div`
+`,Gh=R.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+`,Kh=R.button`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid ${e=>e.theme.border};
+  background: ${e=>e.theme.bgElevated};
+  color: ${e=>e.theme.text};
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s ease, transform 0.05s ease;
+  &:hover {
+    background: ${e=>e.theme.bgHover};
+  }
+  &:active {
+    transform: scale(0.99);
+  }
+`,qh=R.div`
+  font-size: 28px;
+  flex-shrink: 0;
+`,Jh=R.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`,Yh=R.div`
+  font-size: 15px;
+  font-weight: 700;
+`,Xh=R.div`
+  font-size: 13px;
+  color: ${e=>e.theme.textMuted};
+`,Zh=R.div`
+  font-size: 24px;
+  color: ${e=>e.theme.textMuted};
+  flex-shrink: 0;
+`,Qh=R.div``,$h=R.div`
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+`,eg=R.h2`
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+`,tg=R.div`
+  width: 60px;
+`,ng=R.button`
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid ${e=>e.theme.border};
+  background: ${e=>e.theme.bgInput};
+  color: ${e=>e.theme.text};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover {
+    background: ${e=>e.theme.bgHover};
+  }
+`,rg=R.button`
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid ${e=>e.theme.border};
+  background: ${e=>e.theme.bgInput};
+  color: ${e=>e.theme.text};
+  font-size: 18px;
+  cursor: pointer;
+  &:hover:not(:disabled) {
+    background: ${e=>e.theme.bgHover};
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+`,ig=R.div`
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+`,ag=R.button`
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid
+    ${e=>e.$active?e.theme.accent:e.theme.border};
+  background: ${e=>e.$active?e.theme.accentSoft:e.theme.bgInput};
+  color: ${e=>e.$active?e.theme.accent:e.theme.textMuted};
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover {
+    color: ${e=>e.theme.text};
+  }
+`,og=R.div`
+  background: ${e=>e.theme.bgElevated};
+  border: 1px solid ${e=>e.theme.border};
+  border-radius: 14px;
+  padding: 18px 16px;
+  margin-bottom: 18px;
+`,sg=R.div`
+  font-size: 13px;
+  font-weight: 700;
+  color: ${e=>e.theme.textMuted};
+  margin-bottom: 16px;
+`,cg=R.div`
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 180px;
+  padding: 0 4px;
+`,lg=R.div`
+  padding: 40px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: ${e=>e.theme.textMuted};
+`,ug=R.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+`,dg=R.div`
+  font-size: 11px;
+  font-weight: 700;
+  color: ${e=>e.theme.text};
+  margin-bottom: 4px;
+`,fg=R.div`
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  background: ${e=>e.theme.bgInput};
+  border-radius: 4px;
+  overflow: hidden;
+`,pg=R.div`
+  width: 100%;
+  background: ${e=>e.theme.accent};
+  border-radius: 4px;
+  min-height: 2px;
+  transition: height 0.3s ease;
+`,mg=R.div`
+  font-size: 10px;
+  color: ${e=>e.theme.textMuted};
+  margin-top: 6px;
+  white-space: nowrap;
+`;R.div`
   background: ${e=>e.theme.bgElevated};
   border: 1px solid ${e=>e.theme.border};
   border-radius: 14px;
   padding: 20px;
   margin-bottom: 24px;
-`,Gh=R.h3`
+`,R.h3`
   font-size: 15px;
   font-weight: 700;
   margin: 0 0 16px;
-`,Kh=R.div`
+`;var hg=R.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
@@ -1423,43 +1575,43 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
-`,qh=R.div`
+`,gg=R.div`
   background: ${e=>e.theme.bgInput};
   border: 1px solid ${e=>e.theme.border};
   border-radius: 10px;
   padding: 12px;
-`,Jh=R.div`
+`,_g=R.div`
   font-size: 11px;
   font-weight: 600;
   color: ${e=>e.theme.textMuted};
   margin-bottom: 6px;
-`,Yh=R.div`
+`,vg=R.div`
   font-size: 22px;
   font-weight: 800;
   color: ${e=>e.theme.accent};
   letter-spacing: -0.5px;
-`,Xh=R.div`
+`,yg=R.div`
   margin-top: 2px;
   font-size: 11px;
   color: ${e=>e.theme.textMuted};
-`,Zh=R.div`
+`,bg=R.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
   max-height: 360px;
   overflow-y: auto;
   padding-right: 4px;
-`,Qh=R.div`
+`,xg=R.div`
   font-size: 12px;
   font-weight: 600;
   color: ${e=>e.theme.textMuted};
   margin-bottom: 6px;
-`,$h=R.div`
+`,Sg=R.div`
   padding: 16px;
   text-align: center;
   font-size: 13px;
   color: ${e=>e.theme.textMuted};
-`,eg=R.div`
+`,Cg=R.div`
   display: grid;
   grid-template-columns: 110px 1fr 1fr;
   align-items: center;
@@ -1469,10 +1621,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
   &:last-child {
     border-bottom: none;
   }
-`,tg=R.div`
+`,wg=R.div`
   font-weight: 600;
   color: ${e=>e.theme.text};
-`,ng=R.div`
+`,Tg=R.div`
   color: ${e=>e.theme.textMuted};
   font-size: 12px;
-`;function rg(){return(0,z.jsx)(Vt,{children:(0,z.jsxs)(zt,{element:(0,z.jsx)(Vd,{}),children:[(0,z.jsx)(zt,{path:`/`,element:(0,z.jsx)(Wd,{})}),(0,z.jsx)(zt,{path:`/lab`,element:(0,z.jsx)(am,{})}),(0,z.jsx)(zt,{path:`/history`,element:(0,z.jsx)(th,{})}),(0,z.jsx)(zt,{path:`/rhksflwkdlqslekaks`,element:(0,z.jsx)(bh,{})})]})})}(0,Zr.createRoot)(document.getElementById(`root`)).render((0,z.jsx)(x.StrictMode,{children:(0,z.jsx)(to,{children:(0,z.jsx)(kn,{children:(0,z.jsx)(rg,{})})})}));
+`;function Eg(){return(0,z.jsx)(Vt,{children:(0,z.jsxs)(zt,{element:(0,z.jsx)(Vd,{}),children:[(0,z.jsx)(zt,{path:`/`,element:(0,z.jsx)(Wd,{})}),(0,z.jsx)(zt,{path:`/lab`,element:(0,z.jsx)(am,{})}),(0,z.jsx)(zt,{path:`/history`,element:(0,z.jsx)(th,{})}),(0,z.jsx)(zt,{path:`/rhksflwkdlqslekaks`,element:(0,z.jsx)(xh,{})})]})})}(0,Zr.createRoot)(document.getElementById(`root`)).render((0,z.jsx)(x.StrictMode,{children:(0,z.jsx)(to,{children:(0,z.jsx)(kn,{children:(0,z.jsx)(Eg,{})})})}));
