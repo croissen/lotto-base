@@ -6,6 +6,79 @@ import {
   invalidateHistoryCache,
 } from '../lib/lotto';
 import { useLatestRound } from '../lib/useLatestRound';
+import { getVisitStats } from '../lib/visits';
+
+/* 방문자 통계 섹션 */
+function VisitStats() {
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getVisitStats(30)
+      .then((data) => {
+        setStats(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message ?? String(err));
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <StatsBox>방문자 통계 로딩 중...</StatsBox>;
+  }
+  if (error) {
+    return <StatsBox>통계 로드 실패: {error}</StatsBox>;
+  }
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const today = stats.find((s) => s.date === todayStr);
+  const total = stats.reduce((sum, s) => sum + s.count, 0);
+  const uniqueTotal = stats.reduce((sum, s) => sum + s.unique_count, 0);
+  const days = stats.length;
+  const avgPerDay = days > 0 ? Math.round(total / days) : 0;
+
+  return (
+    <StatsBox>
+      <StatsTitle>📊 방문자 통계</StatsTitle>
+
+      <SummaryGrid>
+        <SummaryCell>
+          <SummaryLabel>오늘 PV</SummaryLabel>
+          <SummaryValue>{(today?.count ?? 0).toLocaleString()}</SummaryValue>
+          <SummarySub>유니크 {today?.unique_count ?? 0}명</SummarySub>
+        </SummaryCell>
+        <SummaryCell>
+          <SummaryLabel>최근 {days}일 총 PV</SummaryLabel>
+          <SummaryValue>{total.toLocaleString()}</SummaryValue>
+          <SummarySub>유니크 {uniqueTotal.toLocaleString()}</SummarySub>
+        </SummaryCell>
+        <SummaryCell>
+          <SummaryLabel>일평균 PV</SummaryLabel>
+          <SummaryValue>{avgPerDay.toLocaleString()}</SummaryValue>
+          <SummarySub>최근 {days}일 기준</SummarySub>
+        </SummaryCell>
+      </SummaryGrid>
+
+      <DailyList>
+        <DailyTitle>일별 상세</DailyTitle>
+        {stats.length === 0 ? (
+          <DailyEmpty>아직 기록이 없습니다.</DailyEmpty>
+        ) : (
+          stats.map((s) => (
+            <DailyRow key={s.date}>
+              <DailyDate>{s.date}</DailyDate>
+              <DailyVal>PV {s.count.toLocaleString()}</DailyVal>
+              <DailyVal>유니크 {s.unique_count.toLocaleString()}</DailyVal>
+            </DailyRow>
+          ))
+        )}
+      </DailyList>
+    </StatsBox>
+  );
+}
 
 /* 3단계 비밀번호 → 회차 추가 폼 */
 export default function Admin() {
@@ -198,6 +271,8 @@ export default function Admin() {
         <h1>회차 추가</h1>
         <Sub>최신 회차: {latestRound ?? '...'}회</Sub>
       </Hidden>
+
+      <VisitStats />
 
       <FormWide onSubmit={handleAddRound}>
         <Row>
@@ -487,4 +562,89 @@ const PrizeSub = styled.span`
   font-size: 11px;
   font-weight: 600;
   color: ${(p) => p.theme.textMuted};
+`;
+
+/* 방문자 통계 styled */
+const StatsBox = styled.div`
+  background: ${(p) => p.theme.bgElevated};
+  border: 1px solid ${(p) => p.theme.border};
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+`;
+const StatsTitle = styled.h3`
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 16px;
+`;
+const SummaryGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+const SummaryCell = styled.div`
+  background: ${(p) => p.theme.bgInput};
+  border: 1px solid ${(p) => p.theme.border};
+  border-radius: 10px;
+  padding: 12px;
+`;
+const SummaryLabel = styled.div`
+  font-size: 11px;
+  font-weight: 600;
+  color: ${(p) => p.theme.textMuted};
+  margin-bottom: 6px;
+`;
+const SummaryValue = styled.div`
+  font-size: 22px;
+  font-weight: 800;
+  color: ${(p) => p.theme.accent};
+  letter-spacing: -0.5px;
+`;
+const SummarySub = styled.div`
+  margin-top: 2px;
+  font-size: 11px;
+  color: ${(p) => p.theme.textMuted};
+`;
+const DailyList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+`;
+const DailyTitle = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  color: ${(p) => p.theme.textMuted};
+  margin-bottom: 6px;
+`;
+const DailyEmpty = styled.div`
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: ${(p) => p.theme.textMuted};
+`;
+const DailyRow = styled.div`
+  display: grid;
+  grid-template-columns: 110px 1fr 1fr;
+  align-items: center;
+  padding: 8px 4px;
+  font-size: 13px;
+  border-bottom: 1px solid ${(p) => p.theme.border};
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+const DailyDate = styled.div`
+  font-weight: 600;
+  color: ${(p) => p.theme.text};
+`;
+const DailyVal = styled.div`
+  color: ${(p) => p.theme.textMuted};
+  font-size: 12px;
 `;
