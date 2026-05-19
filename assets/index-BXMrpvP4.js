@@ -84,7 +84,7 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
     font-size: 14px;
     margin-left: 2px;
   }
-`;function lo(){return(0,z.jsx)(uo,{children:(0,z.jsxs)(fo,{children:[(0,z.jsxs)(po,{children:[(0,z.jsx)(B,{children:`[면책 공지 · 필독]`}),(0,z.jsxs)(`p`,{children:[`본 사이트(로또베이스)는 통계 기반 번호 생성 서비스를 제공하며,`,` `,(0,z.jsx)(V,{children:`당첨을 절대 보장하지 않습니다.`}),` 생성된 번호는 참고용이며 당첨 결과에 대한 책임을 지지 않습니다.`]}),(0,z.jsxs)(`p`,{children:[`유료 멤버십은 번호 생성 편의 기능에 대한 이용료이며, 당첨 번호 판매가 아닙니다. 로또는 `,(0,z.jsx)(V,{children:`만 19세 이상`}),`만 구매 가능하며 건전하게 즐겨주세요. 도박 문제로 어려움을 겪고 계시다면`,` `,(0,z.jsx)(V,{children:`한국 도박문제 예방치유원 1336`}),`으로 연락해주세요.`]})]}),(0,z.jsxs)(mo,{children:[(0,z.jsx)(ho,{children:`[로또베이스]`}),` · 번호 생성 서비스 · 당첨 보장 없음`]}),(0,z.jsx)(go,{children:`© 2026 로또베이스. All Rights Reserved.`})]})})}var uo=R.footer`
+`;function lo(){return(0,z.jsx)(uo,{children:(0,z.jsxs)(fo,{children:[(0,z.jsxs)(po,{children:[(0,z.jsx)(B,{children:`[면책 공지 · 필독]`}),(0,z.jsxs)(`p`,{children:[`본 사이트(로또베이스)는 통계 기반 번호 생성 서비스를 제공하며,`,` `,(0,z.jsx)(V,{children:`당첨을 절대 보장하지 않습니다.`}),` 생성된 번호는 참고용이며 당첨 결과에 대한 책임을 지지 않습니다.`]}),(0,z.jsxs)(`p`,{children:[`로또는 `,(0,z.jsx)(V,{children:`만 19세 이상`}),`만 구매 가능하며 건전하게 즐겨주세요. 도박 문제로 어려움을 겪고 계시다면`,` `,(0,z.jsx)(V,{children:`한국 도박문제 예방치유원 1336`}),`으로 연락해주세요.`]})]}),(0,z.jsxs)(mo,{children:[(0,z.jsx)(ho,{children:`[로또베이스]`}),` · 번호 생성 서비스 · 당첨 보장 없음`]}),(0,z.jsx)(go,{children:`© 2026 로또베이스. All Rights Reserved.`})]})})}var uo=R.footer`
   margin: 40px 0 24px;
 `,fo=R.div`
   max-width: 920px;
