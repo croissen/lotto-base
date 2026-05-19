@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import { useMediaQuery } from '../lib/useMediaQuery';
 
 const LEFT_AD_ID = 'DAN-UHt2zZPtBbBQtADK';
 const RIGHT_AD_ID = 'DAN-h249ZEkAq8EKbqK8';
@@ -36,11 +37,20 @@ function SideAdSlot({ adUnitId }) {
   return <Slot ref={containerRef} />;
 }
 
+// 카카오 애드핏 정책: 페이지당 광고 단위 최대 4개.
+// 사이드 광고를 CSS만으로 숨기면 ins 태그가 DOM에 남아 카운트되므로
+// useMediaQuery로 조건부 렌더링하여 작은 화면에선 DOM 자체에서 제외.
 export default function SideAds() {
   const { pathname } = useLocation();
-  // 히스토리 페이지는 테이블이 최대 1280px까지 확장됨 (History.jsx의 TableWrap 참고)
-  // 일반 페이지(콘텐츠 920px) 대비 광고를 더 바깥쪽으로 배치해야 가려지지 않음
   const isHistory = pathname === '/history';
+
+  // 일반 페이지: 920px 콘텐츠 + 양옆 광고 → viewport 1280px 필요
+  // 히스토리: 1280px 테이블 + 양옆 광고 → viewport 1640px 필요
+  const wideEnoughNormal = useMediaQuery('(min-width: 1280px)');
+  const wideEnoughHistory = useMediaQuery('(min-width: 1640px)');
+  const shouldShow = isHistory ? wideEnoughHistory : wideEnoughNormal;
+
+  if (!shouldShow) return null;
 
   return (
     <>
@@ -60,20 +70,10 @@ const LeftWrap = styled.div`
   width: ${AD_WIDTH}px;
   height: ${AD_HEIGHT}px;
   z-index: 30;
-  /* 일반: 콘텐츠 920px 영역 바깥 (50% - 460px - 20px - 160px) */
   left: calc(50% - 460px - 20px - ${AD_WIDTH}px);
-  @media (max-width: 1279px) {
-    display: none;
-  }
   ${(p) =>
     p.$isHistory &&
-    `
-    /* 히스토리: 테이블 1280px 영역 바깥 (50% - 640px - 20px - 160px) */
-    left: calc(50% - 640px - 20px - ${AD_WIDTH}px);
-    @media (max-width: 1639px) {
-      display: none;
-    }
-  `}
+    `left: calc(50% - 640px - 20px - ${AD_WIDTH}px);`}
 `;
 
 const RightWrap = styled.div`
@@ -83,17 +83,9 @@ const RightWrap = styled.div`
   height: ${AD_HEIGHT}px;
   z-index: 30;
   right: calc(50% - 460px - 20px - ${AD_WIDTH}px);
-  @media (max-width: 1279px) {
-    display: none;
-  }
   ${(p) =>
     p.$isHistory &&
-    `
-    right: calc(50% - 640px - 20px - ${AD_WIDTH}px);
-    @media (max-width: 1639px) {
-      display: none;
-    }
-  `}
+    `right: calc(50% - 640px - 20px - ${AD_WIDTH}px);`}
 `;
 
 const Slot = styled.div`
