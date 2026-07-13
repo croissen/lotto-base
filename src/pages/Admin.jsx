@@ -234,6 +234,40 @@ export default function Admin() {
     setNums(next);
   };
 
+  // "12 15 19 22 24 36 3" 형태를 한 번에 분배
+  // (공백/쉼표/탭/줄바꿈 등 아무 구분자나 허용, 6개 이상이면 마지막은 보너스)
+  const fillFromText = (text) => {
+    const parts = String(text)
+      .split(/[^0-9]+/)
+      .filter((s) => s !== '')
+      .map((s) => s.slice(0, 2)); // 두 자리로 제한
+    if (parts.length < 2) return false; // 숫자 하나뿐이면 일반 입력으로 처리
+
+    const six = parts.slice(0, 6);
+    const next = ['', '', '', '', '', ''];
+    six.forEach((p, i) => {
+      next[i] = p;
+    });
+    setNums(next);
+
+    // 7개 이상이면 7번째를 보너스로
+    if (parts.length >= 7) {
+      setBonus(parts[6]);
+    }
+    setSubmitMsg(null);
+    return true;
+  };
+
+  // input에서 붙여넣기 감지 → 여러 숫자면 자동 분배
+  const handleNumsPaste = (e) => {
+    const text = e.clipboardData?.getData('text') ?? '';
+    const nCount = (text.match(/\d+/g) ?? []).length;
+    if (nCount >= 2) {
+      e.preventDefault();
+      fillFromText(text);
+    }
+  };
+
   // 회차 추가 제출
   const handleAddRound = async (e) => {
     e.preventDefault();
@@ -415,6 +449,26 @@ export default function Admin() {
           />
         </Row>
 
+        <Divider />
+        <Label>
+          한 번에 붙여넣기{' '}
+          <Optional>(예: 12 15 19 22 24 36 3 → 본번호 6개 + 보너스)</Optional>
+        </Label>
+        <NumIn
+          type="text"
+          inputMode="numeric"
+          placeholder="12 15 19 22 24 36 3"
+          onPaste={handleNumsPaste}
+          onChange={(e) => {
+            // 붙여넣기가 아닌 직접 입력/자동완성도 처리
+            if ((e.target.value.match(/\d+/g) ?? []).length >= 2) {
+              if (fillFromText(e.target.value)) e.target.value = '';
+            }
+          }}
+          disabled={submitting}
+        />
+        <Divider />
+
         <Label>본번호 6개 (1~45, 서로 다른 수)</Label>
         <NumGrid>
           {nums.map((n, i) => (
@@ -427,6 +481,7 @@ export default function Admin() {
                 placeholder={`${i + 1}`}
                 value={n}
                 onChange={(e) => setNum(i, e.target.value)}
+                onPaste={handleNumsPaste}
                 disabled={submitting}
               />
               {n && Number(n) >= 1 && Number(n) <= 45 && (
@@ -447,6 +502,7 @@ export default function Admin() {
               placeholder="보너스"
               value={bonus}
               onChange={(e) => setBonus(e.target.value.replace(/[^0-9]/g, '').slice(0, 2))}
+              onPaste={handleNumsPaste}
               disabled={submitting}
             />
             {bonus && Number(bonus) >= 1 && Number(bonus) <= 45 && (
