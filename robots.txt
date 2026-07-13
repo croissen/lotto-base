@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /rhksflwkdlqslekaks
 
 Sitemap: https://lottobase.kr/sitemap.xml
