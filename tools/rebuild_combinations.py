@@ -44,13 +44,12 @@ HAS_POPCOUNT = hasattr(np, "bitwise_count")
 
 
 def get_db_url():
-    if not os.path.exists(ENV_PATH):
-        print(f"[X] .env.local 없음: {ENV_PATH}")
-        sys.exit(1)
-    load_dotenv(ENV_PATH)
+    # 로컬: .env.local / CI(GitHub Actions): 환경변수(SUPABASE_DB_URL) 둘 다 지원
+    if os.path.exists(ENV_PATH):
+        load_dotenv(ENV_PATH)
     url = os.getenv("SUPABASE_DB_URL")
     if not url:
-        print("[X] .env.local에 SUPABASE_DB_URL이 없습니다.")
+        print("[X] SUPABASE_DB_URL이 없습니다 (.env.local 또는 환경변수/GitHub Secret).")
         sys.exit(1)
     return url
 

@@ -1,0 +1,43 @@
+name: 최신 회차 자동 갱신
+
+# 실행 방법 2가지:
+#   1) 자동: 매주 토요일 추첨 후 (아래 cron) GitHub가 알아서 실행
+#   2) 수동: 저장소 Actions 탭 → 이 워크플로 선택 → "Run workflow" 버튼 클릭
+#
+# 하는 일: 네이버에서 최신 회차 크롤 → lotto_history에 추가 → combinations 재적재
+# 필요 설정(1회): 저장소 Settings → Secrets and variables → Actions →
+#                 New repository secret → 이름 SUPABASE_DB_URL, 값은 .env.local의 그 접속문자열
+
+on:
+  schedule:
+    - cron: '0 13 * * 6'   # 토 22:00 KST (추첨 직후)
+    - cron: '0 16 * * 6'   # 일 01:00 KST (백업 — 결과 늦게 올라온 경우)
+  workflow_dispatch: {}      # 수동 실행 버튼
+
+concurrency:
+  group: update-lotto
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: 파이썬 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 패키지 설치
+        run: |
+          python -m pip install --upgrade pip
+          pip install playwright psycopg2-binary python-dotenv numpy
+          python -m playwright install --with-deps chromium
+
+      - name: 최신 회차 갱신 (크롤 → 추가 → 재적재)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python tools/update_latest.py
